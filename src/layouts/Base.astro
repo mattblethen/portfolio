@@ -1,0 +1,52 @@
+---
+import "../styles/global.css";
+
+const {
+  title = "Matt — Full-Stack Shopify & Web Developer",
+  description = "Custom Shopify 2.0 themes, Liquid, performance, integrations, and full-stack web builds.",
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <slot name="head" />
+  </head>
+  <body>
+    <!-- Shared Header / Nav -->
+    <header>
+      <div class="wrap nav">
+        <a class="brand" href="/">Matt Blethen</a>
+
+        <nav aria-label="Primary">
+          <ul>
+            <li><a href="/#projects">Projects</a></li>
+            <li><a href="/#services">Services</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <slot />
+
+    <!-- Shared Footer -->
+    <footer>
+      <div class="wrap">
+        <p>© {new Date().getFullYear()} Matt Blethen</p>
+        <div class="foot-links">
+          <a href="mailto:you@example.com">you@example.com</a>
+          <a href="https://github.com/mattblethen" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer">LinkedIn</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

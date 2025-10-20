@@ -1,0 +1,39 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Contact — Matt Blethen" description="Get in touch about a project">
+  <main class="wrap contact-page">
+    <h1>Contact Me</h1>
+    <p class="muted">
+      Have a project in mind or just want to say hello? Fill out the form below or email me directly at
+      <a href="mailto:mattblethen@gmail.com">mattblethen@gmail.com</a>.
+    </p>
+
+    <form
+      action="https://formspree.io/f/xjkadkdy"
+      method="POST"
+      class="contact-form"
+    >
+      <label>
+        Name
+        <input type="text" name="name" required />
+      </label>
+
+      <label>
+        Email
+        <input type="email" name="_replyto" required />
+      </label>
+
+      <label>
+        Message
+        <textarea name="message" rows="6" required></textarea>
+      </label>
+
+      <!-- Basic spam honeypot: keep hidden -->
+      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
+
+      <button type="submit" class="cta">Send Message</button>
+    </form>
+  </main>
+</Base>

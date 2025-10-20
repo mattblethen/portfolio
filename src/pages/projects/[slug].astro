@@ -1,0 +1,22 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection, render } from "astro:content";
+
+// Build all project pages at build time
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((p) => ({
+    params: { slug: p.slug },
+    props: { entry: p },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, summary } = entry.data;
+---
+
+<Base title={title} description={summary ?? "Project case study"}>
+  {/* Let the MDX own its structure (wrap, hero, etc.) */}
+  <Content />
+</Base>

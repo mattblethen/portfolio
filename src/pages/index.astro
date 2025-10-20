@@ -1,22 +1,158 @@
 ---
-import ProjectCard from "../components/ProjectCard.astro";
+import Base from "../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+// Load all projects from the content collection
+const entries = await getCollection("projects");
+
+// Sort by date desc
+entries.sort((a, b) => {
+  const da = new Date((a.data.date as any) || 0).getTime();
+  const db = new Date((b.data.date as any) || 0).getTime();
+  return db - da;
+});
+
+// Fallback preview image
+const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent(
+  `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'>
+    <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+      <stop offset='0%' stop-color='#e9eef7'/><stop offset='100%' stop-color='#f6f8fc'/>
+    </linearGradient></defs>
+    <rect width='100%' height='100%' fill='url(#g)'/>
+    <g fill='#8aa0c8' font-family='Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif' font-size='42' font-weight='600' text-anchor='middle' dominant-baseline='middle'>
+      <text x='50%' y='50%'>Project Preview</text>
+    </g>
+  </svg>`
+)}`;
+
+// Build card data
+const cards = entries.map(({ slug, data }) => {
+  const title = data.title ?? "Untitled Project";
+  const tags = (data.tags ?? []).slice(0, 4);
+  const url = `/projects/${slug}/`;
+  return {
+    url,
+    img: data.hero ?? placeholder,
+    title,
+    summary: data.summary ?? "",
+    tags,
+    kicker: tags.length ? tags[0] : "Case Study",
+    ariaLabel: "View project — " + title,
+  };
+});
+
+const page = {
+  title: "Shopify Developer — Online Stores & Websites that Perform",
+  description:
+    "Full-stack developer specializing in Shopify. I build fast, beautiful online stores and also craft WordPress/Astro sites for service businesses.",
+};
 ---
 
-<html lang="en">
-  <head><meta charset="utf-8" /><title>Matt — Full-Stack Dev</title></head>
-  <body>
-    <main style="max-width:1100px;margin:2rem auto;padding:0 1rem;">
-      <h1>Matt — Full-Stack Shopify & Web</h1>
-      <p>Custom themes • Liquid blocks • Performance • Integrations</p>
+<Base {...page}>
+  <main class="wrap">
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <div class="eyebrow">Shopify • Full-Stack Developer</div>
+        <h1 id="hero-title" class="title">I build online stores and websites that look great and perform even better.</h1>
+        <p class="lede">
+          I specialize in Shopify for e-commerce—designing, building, and optimizing stores that convert.
+          I also craft WordPress and Astro sites for service businesses that need a clean, fast, and easy-to-update web presence.
+        </p>
+        <a class="cta" href="#projects">See Recent Work</a>
+      </div>
 
-      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:1.5rem;">
-        <ProjectCard
-          title="The Castle Jewelry"
-          href="/projects/castle-jewelry"
-          img="/images/castle-hero.png"
-          desc="Custom Shopify 2.0 theme with metafields & performance tuning."
-        />
-      </section>
-    </main>
-  </body>
-</html>
+      <div class="hero-img">
+        <!-- Swap to your real portrait when ready -->
+        <img src="/images/portrait.png" alt="Portrait of Matt Blethen" width="360" height="360" loading="eager" />
+      </div>
+    </section>
+
+    <!-- Who I Work With -->
+    <section class="section" aria-labelledby="who-title">
+      <h2 id="who-title">Who I Work With</h2>
+      <p class="muted">
+        I partner with store owners, founders, and local service providers who need more than a template.
+        Whether you sell products online or offer services like real estate, construction, veterinary care, dental or medical,
+        I build sites that help you attract visitors and turn them into customers.
+      </p>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="section" aria-labelledby="projects-title">
+      <h2 id="projects-title">Projects</h2>
+      <p class="muted">Recent work across Shopify stores and custom websites.</p>
+
+      <div class="grid" style="margin-top:14px">
+        {cards.map((c) => (
+          <article class="card">
+            <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
+              <img src={c.img} alt={c.title + " preview"} width="1200" height="675" loading="lazy" />
+            </a>
+            <div class="body">
+              <p class="kicker">{c.kicker}</p>
+              <h3>{c.title}</h3>
+              {c.summary ? <p class="muted">{c.summary}</p> : null}
+              <div class="tags">
+                {c.tags.map((t) => <span class="tag">{t}</span>)}
+              </div>
+              <a class="view" href={c.url}>View project →</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- Services (results-focused) -->
+    <section id="services" class="section" aria-labelledby="services-title">
+      <h2 id="services-title">Services</h2>
+      <div class="services" role="list">
+        <div class="service" role="listitem">
+          <h4>Shopify Store Design & Development</h4>
+          <p>Custom themes that showcase your products, simplify management, and boost conversions.</p>
+        </div>
+        <div class="service" role="listitem">
+          <h4>Speed & Optimization</h4>
+          <p>Faster load times, better search rankings, and a smoother experience on every device.</p>
+        </div>
+        <div class="service" role="listitem">
+          <h4>Smart Integrations & Automation</h4>
+          <p>Connect email, reviews, subscriptions, inventory, and more—so your store runs smoothly.</p>
+        </div>
+        <div class="service" role="listitem">
+          <h4>WordPress & Custom Sites</h4>
+          <p>Professional sites for service businesses like realtors, contractors, vets, dentists, and clinics.</p>
+        </div>
+        <div class="service" role="listitem">
+          <h4>Ongoing Support</h4>
+          <p>Updates, improvements, and performance tuning after launch—so you can focus on the business.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Process -->
+    <section class="section" aria-labelledby="process-title">
+      <h2 id="process-title">How We’ll Work</h2>
+      <div class="services" role="list">
+        <div class="service" role="listitem">
+          <h4>1) Discovery</h4>
+          <p>We map your goals, products/services, and customers to define what success looks like.</p>
+        </div>
+        <div class="service" role="listitem">
+          <h4>2) Build</h4>
+          <p>Design and development tailored to your brand—focused on clarity, speed, and conversion.</p>
+        </div>
+        <div class="service" role="listitem">
+          <h4>3) Launch & Support</h4>
+          <p>Go live with confidence. I’m available for updates, enhancements, and ongoing optimization.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="cta-banner" aria-label="Contact banner">
+      <p><strong>Ready to grow your online business?</strong> Let’s build a site that’s fast, flexible, and built to convert.</p>
+      <a class="cta" href="/contact">Start a Project</a>
+    </section>
+  </main>
+</Base>
