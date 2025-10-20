@@ -1,0 +1,22 @@
+---
+import ProjectCard from "../components/ProjectCard.astro";
+---
+
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Matt — Full-Stack Dev</title></head>
+  <body>
+    <main style="max-width:1100px;margin:2rem auto;padding:0 1rem;">
+      <h1>Matt — Full-Stack Shopify & Web</h1>
+      <p>Custom themes • Liquid blocks • Performance • Integrations</p>
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:1.5rem;">
+        <ProjectCard
+          title="The Castle Jewelry"
+          href="/projects/castle-jewelry"
+          img="/images/castle-hero.png"
+          desc="Custom Shopify 2.0 theme with metafields & performance tuning."
+        />
+      </section>
+    </main>
+  </body>
+</html>

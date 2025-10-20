@@ -1,0 +1,10 @@
+---
+const { title, desc, href, img } = Astro.props;
+---
+<a href={href} style="text-decoration:none;color:inherit;border-radius:16px;overflow:hidden;border:1px solid #eee;display:block;">
+  <img src={img} alt={title} style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;" />
+  <div style="padding:14px 16px;">
+    <h3 style="margin:0 0 6px 0;">{title}</h3>
+    <p style="margin:0;opacity:0.8;">{desc}</p>
+  </div>
+</a>
