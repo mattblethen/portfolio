@@ -1,6 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 
 // Load all projects from the content collection
 const entries = await getCollection("projects");
@@ -25,10 +25,10 @@ const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent(
   </svg>`
 )}`;
 
-// Build card data
-const cards = entries.map(({ slug, data }) => {
+// Card builder with types
+const toCard = ({ slug, data }: CollectionEntry<"projects">) => {
   const title = data.title ?? "Untitled Project";
-  const tags = (data.tags ?? []).slice(0, 4);
+  const tags = ((data.tags ?? []) as string[]).slice(0, 4);
   const url = `/projects/${slug}/`;
   return {
     url,
@@ -38,13 +38,31 @@ const cards = entries.map(({ slug, data }) => {
     tags,
     kicker: tags.length ? tags[0] : "Case Study",
     ariaLabel: "View project — " + title,
+    slug,
   };
-});
+};
 
+// Selected Graphic Design (tagged "design" or "graphic")
+const designCards = entries
+  .filter((entry: CollectionEntry<"projects">) => {
+    const t = ((entry.data.tags ?? []) as string[]).map((x: string) => x.toLowerCase());
+    return t.includes("design") || t.includes("graphic");
+  })
+  .map(toCard);
+
+// Web-first list excludes those design-only items
+const webCards = entries
+  .filter((entry: CollectionEntry<"projects">) => {
+    const t = ((entry.data.tags ?? []) as string[]).map((x: string) => x.toLowerCase());
+    return !(t.includes("design") || t.includes("graphic"));
+  })
+  .map(toCard);
+
+// Page meta
 const page = {
-  title: "Shopify Developer — Online Stores & Websites that Perform",
+  title: "Shopify Developer — Online Stores & Web-First Design that Performs",
   description:
-    "Full-stack developer specializing in Shopify. I build fast, beautiful online stores and also craft WordPress/Astro sites for service businesses.",
+    "Full-stack Shopify developer with a web-first graphic design background. I turn polished mockups into high-performing, accessible storefronts — plus WordPress/Astro sites for service businesses.",
 };
 ---
 
@@ -53,17 +71,20 @@ const page = {
     <!-- Hero -->
     <section class="hero" aria-labelledby="hero-title">
       <div>
-        <div class="eyebrow">Shopify • Full-Stack Developer</div>
+        <div class="eyebrow">Shopify • Web-First Designer & Full-Stack Dev</div>
         <h1 id="hero-title" class="title">I build online stores and websites that look great and perform even better.</h1>
         <p class="lede">
-          I specialize in Shopify for e-commerce—designing, building, and optimizing stores that convert.
-          I also craft WordPress and Astro sites for service businesses that need a clean, fast, and easy-to-update web presence.
+          I’m a developer with a strong graphic design background. That means cleaner UI, tighter brand alignment, and
+          pixel-accurate builds — I can take a visual mockup and program it almost identically in code.
+          Shopify is my specialty for e-commerce. I also craft WordPress and Astro sites for service businesses.
         </p>
-        <a class="cta" href="#projects">See Recent Work</a>
+        <div class="cta-row" style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a class="cta" href="#projects">See Recent Web Work</a>
+          <a class="cta secondary" href="#design">See Selected Design</a>
+        </div>
       </div>
 
       <div class="hero-img">
-        <!-- Swap to your real portrait when ready -->
         <img src="/images/portrait.png" alt="Portrait of Matt Blethen" width="360" height="360" loading="eager" />
       </div>
     </section>
@@ -74,17 +95,18 @@ const page = {
       <p class="muted">
         I partner with store owners, founders, and local service providers who need more than a template.
         Whether you sell products online or offer services like real estate, construction, veterinary care, dental or medical,
-        I build sites that help you attract visitors and turn them into customers.
+        I build sites that help you attract visitors and turn them into customers. Need brand assets or campaign creatives?
+        I handle those too — designed to work on the web first.
       </p>
     </section>
 
-    <!-- Projects -->
+    <!-- Projects (Web-first) -->
     <section id="projects" class="section" aria-labelledby="projects-title">
       <h2 id="projects-title">Projects</h2>
       <p class="muted">Recent work across Shopify stores and custom websites.</p>
 
       <div class="grid" style="margin-top:14px">
-        {cards.map((c) => (
+        {webCards.map((c) => (
           <article class="card">
             <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
               <img src={c.img} alt={c.title + " preview"} width="1200" height="675" loading="lazy" />
@@ -94,7 +116,7 @@ const page = {
               <h3>{c.title}</h3>
               {c.summary ? <p class="muted">{c.summary}</p> : null}
               <div class="tags">
-                {c.tags.map((t) => <span class="tag">{t}</span>)}
+                {c.tags.map((t: string) => <span class="tag">{t}</span>)}
               </div>
               <a class="view" href={c.url}>View project →</a>
             </div>
@@ -103,13 +125,50 @@ const page = {
       </div>
     </section>
 
-    <!-- Services (results-focused) -->
+    <!-- Selected Graphic Design (subtle, secondary) -->
+    {designCards.length ? (
+      <section id="design" class="section" aria-labelledby="design-title">
+        <h2 id="design-title">Selected Graphic Design</h2>
+        <p class="muted">
+          Logos, brand systems, campaign art, and UI comps created with a web-first mindset. You can hire me for design-only,
+          or as part of a full website or Shopify build.
+        </p>
+
+        <div class="grid design-grid" style="margin-top:10px">
+          {designCards.map((c) => (
+            <article class="card compact" style="--card-scale:0.94">
+              <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
+                <img src={c.img} alt={c.title + " design preview"} width="1200" height="675" loading="lazy" />
+              </a>
+              <div class="body">
+                <p class="kicker">Design</p>
+                <h3>{c.title}</h3>
+                {c.summary ? <p class="muted">{c.summary}</p> : null}
+                <div class="tags">
+                  {c.tags.map((t: string) => <span class="tag">{t}</span>)}
+                </div>
+                <a class="view" href={c.url}>View case →</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    ) : null}
+
+    <!-- Services -->
     <section id="services" class="section" aria-labelledby="services-title">
       <h2 id="services-title">Services</h2>
       <div class="services" role="list">
         <div class="service" role="listitem">
           <h4>Shopify Store Design & Development</h4>
           <p>Custom themes that showcase your products, simplify management, and boost conversions.</p>
+        </div>
+        <div class="service" role="listitem">
+          <h4>Web-First Graphic Design & Brand Assets</h4>
+          <p>
+            Logos, brand kits, landing page/UI comps, and campaign creatives designed to translate cleanly to code.
+            Hire me for design-only, or combine with development for seamless builds.
+          </p>
         </div>
         <div class="service" role="listitem">
           <h4>Speed & Optimization</h4>
@@ -151,8 +210,15 @@ const page = {
 
     <!-- Contact CTA -->
     <section class="cta-banner" aria-label="Contact banner">
-      <p><strong>Ready to grow your online business?</strong> Let’s build a site that’s fast, flexible, and built to convert.</p>
-      <a class="cta" href="/contact">Start a Project</a>
+      <p>
+        <strong>Ready to grow your online business?</strong> Let’s build a site that’s fast, flexible, and built to convert.
+        <br />
+        Prefer design-only? I can deliver brand assets, UI comps, or campaign graphics that hand off cleanly to your team.
+      </p>
+      <div class="cta-row" style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a class="cta" href="/contact">Start a Web Project</a>
+        <a class="cta secondary" href="/contact?type=design">Inquire: Design-Only</a>
+      </div>
     </section>
   </main>
 </Base>

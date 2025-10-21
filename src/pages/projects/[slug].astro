@@ -13,10 +13,156 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const { title, summary } = entry.data;
+
+// Pull common fields from frontmatter
+const {
+  title,
+  summary,
+  hero,
+  client,
+  date,
+  tags = [],
+  services = [],
+  tech = [],
+} = entry.data as {
+  title: string;
+  summary?: string;
+  hero?: string;
+  client?: string;
+  date?: string | Date;
+  tags?: string[];
+  services?: string[];
+  tech?: string[];
+};
+
+// Detect design-style projects (print/graphic)
+const t = tags.map((x) => x.toLowerCase());
+const isDesign = t.includes("design") || t.includes("graphic") || t.includes("print");
+
+// Build eyebrow text (lightweight)
+const eyebrow = isDesign
+  ? "Graphic Design • Print"
+  : (tech.length ? tech.slice(0,3).join(" • ") : (tags[0] ?? "Case Study"));
 ---
 
 <Base title={title} description={summary ?? "Project case study"}>
-  {/* Let the MDX own its structure (wrap, hero, etc.) */}
-  <Content />
+  <style>
+    /* Scoped to project pages rendered by this route */
+    .project-hero .hero-img img{
+      /* ensure hero image uses theme radius, not circular avatar */
+      border-radius: var(--radius);
+      object-fit: cover;
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    /* Viewer for portrait flyers: contain on desktop, full-width on mobile */
+    .flyer-viewport{
+      display:flex; align-items:center; justify-content:center;
+      background:#fff; border:1px solid var(--line);
+      border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:12px;
+    }
+    @media (min-width: 981px){
+      .flyer-viewport img{
+        max-height: 88vh;     /* fits inside the screen height */
+        max-width: 100%;
+        width: auto; height: auto;
+        object-fit: contain;  /* no cropping */
+        border-radius:12px;
+        display:block;
+      }
+    }
+    @media (max-width: 980px){
+      .flyer-viewport img{
+        width:100%; height:auto;  /* tall on phones (preferred) */
+        border-radius:12px;
+        display:block;
+      }
+    }
+  </style>
+
+  <div class="wrap project">
+    <nav class="crumbs" aria-label="breadcrumbs">
+      <a href="/">Home</a> &nbsp;/&nbsp; <a href="/#projects">Projects</a> &nbsp;/&nbsp; {title}
+    </nav>
+
+    <section class="hero project-hero">
+      <div>
+        <div class="eyebrow">{eyebrow}</div>
+        <h1 class="title">{title}</h1>
+        {summary ? <p class="lede">{summary}</p> : null}
+
+        <div class="meta" aria-label="Project meta">
+          {client ? <span class="chip">Client: {client}</span> : null}
+          {date ? <span class="chip">Year: {new Date(date).getFullYear()}</span> : null}
+          {isDesign ? <span class="chip">Format: 8.5×11 in</span> : null}
+        </div>
+      </div>
+
+      {hero ? (
+        <figure class="hero-img">
+          <img src={hero} alt={title + " hero image"} loading="eager" />
+        </figure>
+      ) : null}
+    </section>
+
+    <section class="project-grid" aria-label="Project content">
+      <div>
+        {/* Overview/body */}
+        <article class="card">
+          <h2>Overview</h2>
+          {/* The Content body (pure Markdown — no raw HTML needed) */}
+          <Content />
+        </article>
+
+        {/* Design-only visual: reuse the single hero image as the full flyer */}
+        {isDesign && hero ? (
+          <article class="card">
+            <h2>Full Flyer</h2>
+            <div class="flyer-viewport" aria-label="Letter-size flyer preview">
+              <img src={hero} alt={title + " — full flyer"} loading="lazy" />
+            </div>
+          </article>
+        ) : null}
+      </div>
+
+      <aside>
+        {services.length ? (
+          <div class="card">
+            <h2>Services</h2>
+            <ul class="list">
+              {services.map((s) => <li>{s}</li>)}
+            </ul>
+          </div>
+        ) : null}
+
+        {tech.length ? (
+          <div class="card">
+            <h2>Tech</h2>
+            <ul class="list">
+              {tech.map((x) => <li>{x}</li>)}
+            </ul>
+          </div>
+        ) : null}
+
+        {tags.length ? (
+          <div class="card">
+            <h2>Tags</h2>
+            <div class="meta" style="padding:10px">
+              {tags.map((tag) => <span class="chip">{tag}</span>)}
+            </div>
+          </div>
+        ) : null}
+      </aside>
+    </section>
+
+    <div class="bottom-nav">
+      <a href="/#projects">← Back to Projects</a>
+      <a href="/contact">Start a project →</a>
+    </div>
+  </div>
 </Base>
