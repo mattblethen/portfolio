@@ -17,15 +17,126 @@ const {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <slot name="head" />
+    <style>
+      /* Prevent any horizontal scroll issues */
+      html, body { overflow-x: hidden; }
+
+      /* Header */
+      header.site-header {
+        position: sticky; top: 0;
+        background: rgba(255,255,255,0.9);
+        -webkit-backdrop-filter: saturate(130%) blur(8px);
+        backdrop-filter: saturate(130%) blur(8px);
+        border-bottom: 1px solid var(--line);
+        z-index: 100;
+        width: 100%;
+      }
+      .site-header .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 64px;
+        gap: 16px;
+      }
+      .brand { font-weight: 800; letter-spacing: .2px; white-space: nowrap; }
+
+      /* Primary nav */
+      .primary-nav {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .menu-toggle {
+        display: none;
+        background: transparent;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 10px;
+        line-height: 0;
+      }
+      .menu-toggle svg { width: 22px; height: 22px; }
+
+      .nav-list {
+        display: flex;
+        gap: 20px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .nav-list a { color: var(--text); text-decoration: none; }
+
+      /* Mobile menu */
+      @media (max-width: 860px) {
+        .menu-toggle { display: inline-flex; }
+        .nav-list {
+          position: fixed;
+          top: 64px; /* below header */
+          left: 0; right: 0;
+          display: none;
+          flex-direction: column;
+          gap: 0;
+          background: #fff;
+          border-bottom: 1px solid var(--line);
+          
+          z-index: 90;
+        }
+        .nav-list.open { display: flex; }
+        .nav-list li { border-top: 1px solid var(--line); }
+        .nav-list li:first-child { border-top: 0; }
+        .nav-list a { display: block; padding: 14px 20px; }
+      }
+
+      /* Footer */
+      footer.site-footer {
+        border-top: 1px solid var(--line);
+        width: 100%;
+      }
+      .site-footer .wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        min-height: 72px;
+        flex-wrap: wrap; /* allow wrapping so it never overflows */
+      }
+      .foot-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      @media (max-width: 720px) {
+        .site-footer .wrap {
+          flex-direction: column;
+          align-items: flex-start;
+          padding-top: 16px;
+          padding-bottom: 16px;
+        }
+      }
+    </style>
   </head>
   <body>
     <!-- Shared Header / Nav -->
-    <header>
-      <div class="wrap nav">
+    <header class="site-header">
+      <div class="wrap">
         <a class="brand" href="/">Matt Blethen</a>
 
-        <nav aria-label="Primary">
-          <ul>
+        <nav class="primary-nav" aria-label="Primary">
+          <button
+            class="menu-toggle"
+            aria-label="Toggle menu"
+            aria-expanded="false"
+            aria-controls="primary-menu"
+          >
+            <!-- Hamburger / Close icon (CSS swaps via [aria-expanded]) -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <ul id="primary-menu" class="nav-list">
             <li><a href="/#projects">Projects</a></li>
             <li><a href="/#services">Services</a></li>
             <li><a href="/contact">Contact</a></li>
@@ -38,7 +149,7 @@ const {
     <slot />
 
     <!-- Shared Footer -->
-    <footer>
+    <footer class="site-footer">
       <div class="wrap">
         <p>© {new Date().getFullYear()} Matt Blethen</p>
         <div class="foot-links">
@@ -48,5 +159,39 @@ const {
         </div>
       </div>
     </footer>
+
+    <script is:inline>
+      // Simple, accessible mobile nav toggle
+      (function () {
+        const btn = document.querySelector('.menu-toggle');
+        const list = document.getElementById('primary-menu');
+        if (!btn || !list) return;
+
+        function closeOnOutsideClick(e) {
+          if (!list.contains(e.target) && !btn.contains(e.target)) {
+            list.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            document.removeEventListener('click', closeOnOutsideClick);
+          }
+        }
+
+        btn.addEventListener('click', () => {
+          const open = list.classList.toggle('open');
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          if (open) {
+            // Close when clicking outside
+            setTimeout(() => document.addEventListener('click', closeOnOutsideClick), 0);
+          }
+        });
+
+        // Close on Esc
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && list.classList.contains('open')) {
+            list.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

@@ -69,7 +69,7 @@ const page = {
 <Base {...page}>
   <main class="wrap">
     <!-- Hero -->
-    <section class="hero" aria-labelledby="hero-title">
+    <section class="hero hero--cleanphoto" aria-labelledby="hero-title">
       <div>
         <div class="eyebrow">Shopify • Web-First Designer & Full-Stack Dev</div>
         <h1 id="hero-title" class="title">I build online stores and websites that look great and perform even better.</h1>
@@ -84,8 +84,19 @@ const page = {
         </div>
       </div>
 
-      <div class="hero-img">
-        <img src="/images/portrait.png" alt="Portrait of Matt Blethen" width="360" height="360" loading="eager" />
+      <!-- Updated profile with color pop + 3-side trim -->
+      <div class="hero-img hero-img--clean">
+        <figure class="profile-wrap" aria-label="Profile photo">
+          <!-- the gradient 'pop' and three-side trim are handled via ::before and ::after -->
+          <img
+            src="/images/profile.png"
+            alt="Profile photo of Matt Blethen"
+            width="1500"
+            height="2000"
+            loading="eager"
+            decoding="async"
+          />
+        </figure>
       </div>
     </section>
 
@@ -125,7 +136,7 @@ const page = {
       </div>
     </section>
 
-    <!-- Selected Graphic Design (subtle, secondary) -->
+    {/* Selected Graphic Design (subtle, secondary) */}
     {designCards.length ? (
       <section id="design" class="section" aria-labelledby="design-title">
         <h2 id="design-title">Selected Graphic Design</h2>
@@ -221,4 +232,104 @@ const page = {
       </div>
     </section>
   </main>
+
+<style>
+  /* Clean, minimal portrait presentation */
+  .hero-img {
+    display: grid;
+    place-items: center;
+  }
+
+  .profile-wrap {
+    position: relative;
+    width: clamp(220px, 28vw, 380px);
+    aspect-ratio: 3 / 4;
+    border-radius: 50% / 55%; /* creates a natural oval shape */
+    overflow: hidden;
+    background: linear-gradient(180deg, #edf0f3 0%, #d7dee3 100%);
+    box-shadow:
+      0 6px 12px rgba(0,0,0,0.15);
+  }
+
+  .profile-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(100% 100% at 50% 20%, rgba(255,255,255,0.9), rgba(0,0,0,0.05));
+    z-index: 1;
+  }
+
+  .profile-wrap img {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+
+  .profile-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-left: 4px solid rgba(0,0,0,0.1);
+    border-right: 4px solid rgba(0,0,0,0.1);
+    border-bottom: 4px solid rgba(0,0,0,0.1);
+    border-top: none;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  @media (max-width: 640px) {
+    .profile-wrap {
+      width: clamp(200px, 52vw, 320px);
+    }
+  }
+  /* Remove the global “card” look just for this page’s hero image */
+.hero--cleanphoto .hero-img,
+.hero-img--clean{
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Don’t let the global rule make the image circular or add shadow */
+.hero--cleanphoto .hero-img img{
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Keep the clean oval presentation */
+.profile-wrap{
+  position: relative;
+  width: clamp(220px, 28vw, 380px);
+  aspect-ratio: 3 / 4;
+  border-radius: 50% / 55%;
+  overflow: hidden;
+  background: linear-gradient(180deg, #edf0f3 0%, #d7dee3 100%);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+.profile-wrap::before{
+  content:"";
+  position:absolute; inset:0; z-index:1;
+  background: radial-gradient(100% 100% at 50% 20%, rgba(255,255,255,0.85), rgba(0,0,0,0.04));
+}
+.profile-wrap img{
+  position: relative; z-index:2;
+  width:100%; height:100%;
+  object-fit: cover; object-position: center top;
+  display:block;
+}
+
+/* Small screens */
+@media (max-width: 640px){
+  .profile-wrap{ width: clamp(200px, 52vw, 320px); }
+}
+
+</style>
+
 </Base>
