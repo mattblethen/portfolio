@@ -1,10 +1,100 @@
 ---
 import "../styles/global.css";
 
+/**
+ * Props you can pass from any page:
+ *
+ * title?: string
+ * description?: string
+ * image?: string            // absolute or /relative path; used for OG/Twitter
+ * noindex?: boolean         // set true to add noindex on pages you want excluded
+ * breadcrumbs?: Array<{ name: string; url?: string }>
+ * structuredData?: any[]    // extra JSON-LD blocks to inject (e.g., per-project CreativeWork)
+ */
 const {
   title = "Matt — Full-Stack Shopify & Web Developer",
   description = "Custom Shopify 2.0 themes, Liquid, performance, integrations, and full-stack web builds.",
+  image = "/images/og-default.jpg",
+  noindex = false,
+  breadcrumbs = [],
+  structuredData = [],
 } = Astro.props;
+
+// Site + canonical helpers
+const siteOrigin = Astro.site ? (Astro.site as URL).origin : "https://mattblethen.com";
+const canonical = siteOrigin + Astro.url.pathname;
+
+// Normalize OG image to absolute
+const ogImage = (typeof image === "string" && image.startsWith("http")) ? image : (siteOrigin + image);
+
+// Default breadcrumbs: Home > Current Page
+const crumbList =
+  breadcrumbs.length
+    ? breadcrumbs
+    : [
+        { name: "Home", url: siteOrigin + "/" },
+        { name: title, url: canonical },
+      ];
+
+// Build BreadcrumbList JSON-LD
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: crumbList.map((c: { name: string; url?: string }, i: number) => ({
+
+    "@type": "ListItem",
+    position: i + 1,
+    name: c.name,
+    ...(c.url ? { item: c.url } : {}),
+  })),
+};
+
+// Site-level WebSite JSON-LD (+ SearchAction target your search route if/when present)
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Matt Blethen — Shopify & Web Developer",
+  url: siteOrigin,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${siteOrigin}/search?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
+
+// Business JSON-LD: nationwide remote + Central KY local relevance
+const professionalServiceJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: "Matt Blethen — Shopify & Web Developer",
+  url: siteOrigin,
+  image: siteOrigin + "/images/profile.png",
+  description:
+    "Nationwide remote Shopify development and web design, with local availability in Richmond, Lexington, and Central Kentucky.",
+  serviceArea: { "@type": "Country", name: "United States" },
+  areaServed: [
+    "Richmond, KY",
+    "Lexington, KY",
+    "Berea, KY",
+    "Winchester, KY",
+    "Nicholasville, KY",
+    "Georgetown, KY",
+    "Versailles, KY",
+    "Danville, KY",
+    "Lancaster, KY",
+    "Irvine, KY",
+  ].map((c) => ({ "@type": "City", name: c })),
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Richmond",
+    addressRegion: "KY",
+    addressCountry: "US",
+  },
+  sameAs: [],
+};
+
+// Allow page-level schema injection (e.g., CreativeWork on project pages)
+const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd, ...structuredData];
 ---
 <!doctype html>
 <html lang="en">
@@ -13,10 +103,49 @@ const {
     <title>{title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex, follow" /> : <meta name="robots" content="index, follow" />}
+    <link rel="canonical" href={canonical} />
+
+    <!-- Social / Open Graph -->
+    <meta property="og:site_name" content="Matt Blethen — Shopify & Web Developer" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Theming -->
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
+
+    <!-- Icons (adjust paths if you keep favicons elsewhere) -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Default JSON-LD (site / business / breadcrumbs) + page-level injections -->
+    {jsonLdBlocks.map((obj) => (
+      <script type="application/ld+json" set:html={JSON.stringify(obj)}></script>
+    ))}
+
+    <!-- Allow pages to push extra tags into <head> -->
     <slot name="head" />
+
     <style>
       /* Prevent any horizontal scroll issues */
       html, body { overflow-x: hidden; }
@@ -77,7 +206,6 @@ const {
           gap: 0;
           background: #fff;
           border-bottom: 1px solid var(--line);
-          
           z-index: 90;
         }
         .nav-list.open { display: flex; }
@@ -153,9 +281,7 @@ const {
       <div class="wrap">
         <p>© {new Date().getFullYear()} Matt Blethen</p>
         <div class="foot-links">
-          <a href="mailto:you@example.com">you@example.com</a>
-          <a href="https://github.com/mattblethen" target="_blank" rel="noreferrer">GitHub</a>
-          <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer">LinkedIn</a>
+          <a href="mailto:mattblethen@gmail.com">mattblethen@gmail.com</a>
         </div>
       </div>
     </footer>

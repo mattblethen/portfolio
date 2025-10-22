@@ -1,0 +1,30 @@
+---
+const { title, summary, hero, client, date, slug } = Astro.props;
+
+const origin = (Astro.site && Astro.site.origin) || "https://mattblethen.com";
+const canonicalPath = `/projects/${slug}/`;
+const url = origin + canonicalPath;
+const imageAbs = hero?.startsWith("http") ? hero : origin + hero;
+
+const breadcrumbs = [
+  { name: "Home", url: "/" },
+  { name: "Projects", url: "/projects/" },
+  { name: title, url: canonicalPath },
+];
+
+const projectSchema = {
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  name: title,
+  headline: title,
+  description: summary,
+  image: imageAbs,
+  url,
+  datePublished: date,
+  creator: { "@type": "Person", name: "Matt Blethen", url: origin },
+  ...(client ? { producer: { "@type": "Organization", name: client } } : {}),
+  keywords: ["Shopify 2.0", "Liquid", "Metafields", "Performance", "Klaviyo"],
+};
+
+return { breadcrumbs, projectSchema, imageAbs };
+---

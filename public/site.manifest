@@ -1,0 +1,18 @@
+{
+  "name": "Matt Blethen — Shopify & Web Developer",
+  "short_name": "Matt Blethen",
+  "description": "Custom Shopify 2.0 themes, Liquid, performance, integrations, and full-stack web builds.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b0f14",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

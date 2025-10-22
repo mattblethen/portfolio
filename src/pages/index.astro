@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 
-// Load all projects from the content collection
+// Load all projects
 const entries = await getCollection("projects");
 
 // Sort by date desc
@@ -25,7 +25,7 @@ const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent(
   </svg>`
 )}`;
 
-// Card builder with types
+// Card builder
 const toCard = ({ slug, data }: CollectionEntry<"projects">) => {
   const title = data.title ?? "Untitled Project";
   const tags = ((data.tags ?? []) as string[]).slice(0, 4);
@@ -60,34 +60,203 @@ const webCards = entries
 
 // Page meta
 const page = {
-  title: "Shopify Developer — Online Stores & Web-First Design that Performs",
+  title: "Shopify Developer — Nationwide Remote + Central Kentucky Local",
   description:
-    "Full-stack Shopify developer with a web-first graphic design background. I turn polished mockups into high-performing, accessible storefronts — plus WordPress/Astro sites for service businesses.",
+    "U.S.-wide Shopify developer and web designer. Remote collaborations nationwide, with in-person availability for Richmond, Lexington, and Central Kentucky.",
+};
+
+// ---------- Local & Nationwide SEO JSON-LD ----------
+const siteUrl = "https://mattblethen.com"; // update this
+const businessName = "Matt Blethen — Shopify & Web Developer";
+const kyCities = [
+  "Richmond, KY",
+  "Lexington, KY",
+  "Berea, KY",
+  "Winchester, KY",
+  "Nicholasville, KY",
+  "Georgetown, KY",
+  "Versailles, KY",
+  "Danville, KY",
+  "Lancaster, KY",
+  "Irvine, KY",
+];
+
+const professionalService = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: businessName,
+  url: siteUrl,
+  image: `${siteUrl}/images/profile.png`,
+  description:
+    "Nationwide remote Shopify development and web design, with local availability in Richmond, Lexington, and Central Kentucky.",
+  serviceArea: { "@type": "Country", name: "United States" },
+  areaServed: kyCities.map((c) => ({ "@type": "City", name: c })),
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Richmond",
+    addressRegion: "KY",
+    addressCountry: "US",
+  },
+  sameAs: [],
+};
+
+const webSite = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: businessName,
+  url: siteUrl,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${siteUrl}/search?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/` },
+    { "@type": "ListItem", position: 2, name: "Projects", item: `${siteUrl}/projects/` },
+  ],
+};
+
+const faq = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Do you work with clients outside Kentucky?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Yes. Most projects are handled remotely anywhere in the United States. We collaborate via Zoom, shared docs, and structured milestones.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Do you also meet locally in Central Kentucky?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Absolutely. I’m available for in-person meetings in Richmond, Lexington, and surrounding Central KY cities when needed.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What types of businesses do you help?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Ecommerce brands on Shopify and service businesses—contractors, real estate, medical/dental, veterinary, and trades—needing fast, clear websites that convert.",
+      },
+      
+    },{
+  "@type": "Question",
+  "name": "What is your process for new web projects?",
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Each project begins with discovery, followed by design mockups, then development and testing. Clients receive regular updates and clear deliverables at every stage."
+  }
+},
+{
+  "@type": "Question",
+  "name": "Do you offer maintenance or support after launch?",
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. Ongoing site updates, performance optimization, and feature improvements are available after launch for Shopify and custom websites."
+  }
+},
+{
+  "@type": "Question",
+  "name": "Can you redesign my existing Shopify or WordPress site?",
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Absolutely. I can modernize your current Shopify or WordPress site to improve performance, accessibility, and design consistency without losing SEO value."
+  }
+},
+{
+  "@type": "Question",
+  "name": "What does a typical project cost?",
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Most full Shopify builds range between $3,000 and $8,000, while smaller design-only or optimization projects start around $1,000 depending on complexity."
+  }
+},
+{
+  "@type": "Question",
+  "name": "Do you handle content or photography?",
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "I coordinate with photographers or provide remote workflows to ensure product and lifestyle images match your brand aesthetic and platform requirements."
+  }
+},
+{
+  "@type": "Question",
+  "name": "Can you help with SEO and marketing?",
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. I include technical SEO setup and can integrate Google Analytics, Search Console, and marketing automation tools for long-term growth."
+  }
+},
+{
+  "@type": "Question",
+  "name": "Do you build custom apps or integrations for Shopify?",
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "I create custom Liquid sections, advanced automations, and API integrations with tools like Klaviyo and ShipStation. Full app builds are available by request."
+  }
+},
+{
+  "@type": "Question",
+  "name": "How long does it take to complete a new Shopify store?",
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Most custom Shopify stores are completed within 4 to 8 weeks, depending on scope, content readiness, and feedback turnaround time."
+  }
+},
+{
+  "@type": "Question",
+  "name": "Do you require a contract or deposit?",
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. A signed agreement and deposit secure your project slot. The remaining balance is paid in stages or upon completion."
+  }
+}
+
+  ],
 };
 ---
 
 <Base {...page}>
+  {/* JSON-LD */}
+  <script type="application/ld+json" set:html={JSON.stringify(professionalService)}></script>
+  <script type="application/ld+json" set:html={JSON.stringify(webSite)}></script>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumb)}></script>
+  <script type="application/ld+json" set:html={JSON.stringify(faq)}></script>
+
   <main class="wrap">
     <!-- Hero -->
     <section class="hero hero--cleanphoto" aria-labelledby="hero-title">
       <div>
-        <div class="eyebrow">Shopify • Web-First Designer & Full-Stack Dev</div>
-        <h1 id="hero-title" class="title">I build online stores and websites that look great and perform even better.</h1>
+        <div class="eyebrow">Nationwide Remote • Central KY Local</div>
+        <h1 id="hero-title" class="title">
+          Shopify stores and websites that look great and perform even better.
+        </h1>
         <p class="lede">
-          I’m a developer with a strong graphic design background. That means cleaner UI, tighter brand alignment, and
-          pixel-accurate builds — I can take a visual mockup and program it almost identically in code.
-          Shopify is my specialty for e-commerce. I also craft WordPress and Astro sites for service businesses.
+          I collaborate with clients <strong>across the United States</strong> remotely, and I’m also available
+          for <strong>in-person work in Central Kentucky</strong>—including Richmond and Lexington.
+          With a strong graphic-design background, I deliver cleaner UI, tighter brand alignment, and pixel-accurate builds.
         </p>
         <div class="cta-row" style="display:flex; gap:12px; flex-wrap:wrap;">
           <a class="cta" href="#projects">See Recent Web Work</a>
-          <a class="cta secondary" href="#design">See Selected Design</a>
+          <a class="cta secondary" href="#design">See Graphic Design Work</a>
         </div>
       </div>
 
-      <!-- Updated profile with color pop + 3-side trim -->
       <div class="hero-img hero-img--clean">
         <figure class="profile-wrap" aria-label="Profile photo">
-          <!-- the gradient 'pop' and three-side trim are handled via ::before and ::after -->
           <img
             src="/images/profile.png"
             alt="Profile photo of Matt Blethen"
@@ -97,6 +266,22 @@ const page = {
             decoding="async"
           />
         </figure>
+      </div>
+    </section>
+
+    <!-- Nationwide + Local SEO Block -->
+    <section class="section" aria-labelledby="coverage-title">
+      <h2 id="coverage-title">Nationwide Remote • Central Kentucky Local</h2>
+      <p class="muted">
+        I partner with ecommerce and service businesses across the U.S. via structured remote workflows—discovery,
+        design, development, and ongoing optimization. For clients near <strong>Richmond</strong> and <strong>Lexington, KY</strong>,
+        I’m available to meet on-site when it adds value.
+      </p>
+      <div class="service-areas-wrap">
+        <h3 class="h6">Common Local Meet-Up Areas (Central KY)</h3>
+        <ul class="service-areas" aria-label="Service areas in Central Kentucky">
+          {kyCities.map((c) => <li>{c}</li>)}
+        </ul>
       </div>
     </section>
 
@@ -136,10 +321,10 @@ const page = {
       </div>
     </section>
 
-    {/* Selected Graphic Design (subtle, secondary) */}
+    {/* Selected Graphic Design */}
     {designCards.length ? (
       <section id="design" class="section" aria-labelledby="design-title">
-        <h2 id="design-title">Selected Graphic Design</h2>
+        <h2 id="design-title">Graphic Design</h2>
         <p class="muted">
           Logos, brand systems, campaign art, and UI comps created with a web-first mindset. You can hire me for design-only,
           or as part of a full website or Shopify build.
@@ -200,136 +385,149 @@ const page = {
       </div>
     </section>
 
-    <!-- Process -->
-    <section class="section" aria-labelledby="process-title">
-      <h2 id="process-title">How We’ll Work</h2>
-      <div class="services" role="list">
-        <div class="service" role="listitem">
-          <h4>1) Discovery</h4>
-          <p>We map your goals, products/services, and customers to define what success looks like.</p>
-        </div>
-        <div class="service" role="listitem">
-          <h4>2) Build</h4>
-          <p>Design and development tailored to your brand—focused on clarity, speed, and conversion.</p>
-        </div>
-        <div class="service" role="listitem">
-          <h4>3) Launch & Support</h4>
-          <p>Go live with confidence. I’m available for updates, enhancements, and ongoing optimization.</p>
-        </div>
-      </div>
+    <!-- Local + Nationwide FAQs (visible to match FAQ schema) -->
+    <section class="section" aria-labelledby="faq-title">
+      <h2 id="faq-title">FAQs</h2>
+      <details>
+        <summary>Do you work with clients outside Kentucky?</summary>
+        <p>Yes—I work remotely with businesses anywhere in the United States.</p>
+      </details>
+      <details>
+        <summary>Can we meet in person in Central KY?</summary>
+        <p>Yes. I’m available for on-site meetings in Richmond, Lexington, and nearby cities.</p>
+      </details>
+      <details>
+        <summary>Can you speed up or migrate my existing site?</summary>
+        <p>Absolutely—theme refactors, accessibility fixes, and migrations to Shopify or Astro.</p>
+      </details>
+      <details>
+  <summary>What is your process for new web projects?</summary>
+  <p>
+    Every project starts with discovery—clarifying goals, audiences, and design direction.
+    From there, I create a plan, design mockups, and move into development. You'll get regular
+    updates and clear deliverables at every milestone.
+  </p>
+</details>
+
+<details>
+  <summary>Do you offer maintenance or support after launch?</summary>
+  <p>
+    Yes. I provide ongoing updates, performance monitoring, and feature enhancements after launch.
+    This ensures your Shopify store or website continues to run fast and stay secure.
+  </p>
+</details>
+
+<details>
+  <summary>Can you redesign my existing Shopify or WordPress site?</summary>
+  <p>
+    Absolutely. I can rebuild your existing site on a modern framework—keeping your content and SEO value
+    while improving speed, accessibility, and conversion performance.
+  </p>
+</details>
+
+<details>
+  <summary>What does a typical project cost?</summary>
+  <p>
+    Pricing depends on scope, features, and design complexity. Most full Shopify builds range between
+    $3,000–$8,000, while smaller design-only or optimization projects start around $1,000.
+  </p>
+</details>
+
+<details>
+  <summary>Do you handle content or product photography?</summary>
+  <p>
+    I can coordinate with your photographer or recommend remote-friendly workflows for product images,
+    lifestyle shots, and content creation that match your brand’s tone and colors.
+  </p>
+</details>
+
+<details>
+  <summary>Can you help with SEO and marketing setup?</summary>
+  <p>
+    Yes. All sites are optimized for technical SEO by default, and I can integrate Google Analytics,
+    Search Console, and meta data. I also offer ongoing SEO and ad campaign support upon request.
+  </p>
+</details>
+
+
+<details>
+  <summary>How long does it take to complete a new Shopify store?</summary>
+  <p>
+    Most custom Shopify builds take 4–8 weeks, depending on content readiness, design complexity,
+    and feedback turnaround time.
+  </p>
+</details>
+
+<details>
+  <summary>Do you require a contract or deposit?</summary>
+  <p>
+    Yes. A signed project agreement and 30–50% deposit secure your spot in my schedule.
+    The balance is due at key milestones or on completion.
+  </p>
+</details>
+
     </section>
 
     <!-- Contact CTA -->
     <section class="cta-banner" aria-label="Contact banner">
       <p>
-        <strong>Ready to grow your online business?</strong> Let’s build a site that’s fast, flexible, and built to convert.
+        <strong>Ready to grow your online business?</strong> Let’s build something fast, flexible, and built to convert.
         <br />
         Prefer design-only? I can deliver brand assets, UI comps, or campaign graphics that hand off cleanly to your team.
       </p>
       <div class="cta-row" style="display:flex; gap:12px; flex-wrap:wrap;">
-        <a class="cta" href="/contact">Start a Web Project</a>
-        <a class="cta secondary" href="/contact?type=design">Inquire: Design-Only</a>
+        <a class="cta" href="/contact">Start a Project</a>
+        
       </div>
     </section>
   </main>
 
-<style>
-  /* Clean, minimal portrait presentation */
-  .hero-img {
-    display: grid;
-    place-items: center;
-  }
-
-  .profile-wrap {
-    position: relative;
-    width: clamp(220px, 28vw, 380px);
-    aspect-ratio: 3 / 4;
-    border-radius: 50% / 55%; /* creates a natural oval shape */
-    overflow: hidden;
-    background: linear-gradient(180deg, #edf0f3 0%, #d7dee3 100%);
-    box-shadow:
-      0 6px 12px rgba(0,0,0,0.15);
-  }
-
-  .profile-wrap::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(100% 100% at 50% 20%, rgba(255,255,255,0.9), rgba(0,0,0,0.05));
-    z-index: 1;
-  }
-
-  .profile-wrap img {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center top;
-    display: block;
-  }
-
-  .profile-wrap::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    border-left: 4px solid rgba(0,0,0,0.1);
-    border-right: 4px solid rgba(0,0,0,0.1);
-    border-bottom: 4px solid rgba(0,0,0,0.1);
-    border-top: none;
-    border-radius: inherit;
-    pointer-events: none;
-  }
-
-  @media (max-width: 640px) {
+  <style>
+    .hero-img { display: grid; place-items: center; }
     .profile-wrap {
-      width: clamp(200px, 52vw, 320px);
+      position: relative;
+      width: clamp(220px, 28vw, 380px);
+      aspect-ratio: 3 / 4;
+      border-radius: 50% / 55%;
+      overflow: hidden;
+          background: linear-gradient(181deg, #ffec02 0%, #c50000 100%);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
-  }
-  /* Remove the global “card” look just for this page’s hero image */
-.hero--cleanphoto .hero-img,
-.hero-img--clean{
-  border: none;
-  border-radius: 0;
-  overflow: visible;
-  box-shadow: none;
-  background: transparent;
-}
+    .profile-wrap::before {
+      content: "";
+      position: absolute; inset: 0; z-index: 1;
+      background: radial-gradient(100% 100% at 50% 20%, rgba(255,255,255,0.9), rgba(0,0,0,0.05));
+    }
+    .profile-wrap img { position: relative; z-index: 2; width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .profile-wrap::after {
+      content: "";
+      position: absolute; inset: 0; z-index: 3;
+      border-left: 4px solid rgba(0,0,0,0.1);
+      border-right: 4px solid rgba(0,0,0,0.1);
+      border-bottom: 4px solid rgba(0,0,0,0.1);
+      border-top: none; border-radius: inherit; pointer-events: none;
+    }
+    @media (max-width: 640px) { .profile-wrap { width: clamp(200px, 52vw, 320px); } }
 
-/* Don’t let the global rule make the image circular or add shadow */
-.hero--cleanphoto .hero-img img{
-  border-radius: 0;
-  box-shadow: none;
-}
+    .hero--cleanphoto .hero-img, .hero-img--clean { border: none; border-radius: 0; overflow: visible; box-shadow: none; background: transparent; }
+    .hero--cleanphoto .hero-img img { border-radius: 0; box-shadow: none; }
 
-/* Keep the clean oval presentation */
-.profile-wrap{
-  position: relative;
-  width: clamp(220px, 28vw, 380px);
-  aspect-ratio: 3 / 4;
-  border-radius: 50% / 55%;
-  overflow: hidden;
-  background: linear-gradient(180deg, #edf0f3 0%, #d7dee3 100%);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-.profile-wrap::before{
-  content:"";
-  position:absolute; inset:0; z-index:1;
-  background: radial-gradient(100% 100% at 50% 20%, rgba(255,255,255,0.85), rgba(0,0,0,0.04));
-}
-.profile-wrap img{
-  position: relative; z-index:2;
-  width:100%; height:100%;
-  object-fit: cover; object-position: center top;
-  display:block;
-}
+    /* Local/National block */
+    .service-areas-wrap { margin-top: 10px; }
+    .h6 { font-size: .95rem; letter-spacing: .02em; text-transform: uppercase; color: var(--muted, #5b6472); }
+    .service-areas {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px 14px;
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .service-areas li { color: var(--muted, #5b6472); font-size: 0.95rem; }
 
-/* Small screens */
-@media (max-width: 640px){
-  .profile-wrap{ width: clamp(200px, 52vw, 320px); }
-}
-
-</style>
-
+    /* Small clean FAQ */
+    details { border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 12px 14px; margin: 10px 0; background: rgba(0,0,0,0.02); }
+    summary { cursor: pointer; font-weight: 600; }
+    details[open] { background: rgba(0,0,0,0.04); }
+  </style>
 </Base>

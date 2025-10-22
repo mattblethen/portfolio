@@ -24,6 +24,9 @@ const {
   tags = [],
   services = [],
   tech = [],
+  links = {},
+  metrics = [],
+  testimonial = null,
 } = entry.data as {
   title: string;
   summary?: string;
@@ -33,6 +36,15 @@ const {
   tags?: string[];
   services?: string[];
   tech?: string[];
+  links?: { live?: string };
+  metrics?: string[];
+  testimonial?: {
+    name?: string;       // e.g., "Jane Smith"
+    title?: string;      // e.g., "Marketing Director, The Castle Jewelry"
+    photo?: string;      // e.g., "/images/clients/jane.jpg"
+    quote?: string;      // the review text
+    rating?: number;     // 1..5 (optional)
+  } | null;
 };
 
 // Detect design-style projects (print/graphic)
@@ -42,14 +54,84 @@ const isDesign = t.includes("design") || t.includes("graphic") || t.includes("pr
 // Build eyebrow text (lightweight)
 const eyebrow = isDesign
   ? "Graphic Design • Print"
-  : (tech.length ? tech.slice(0,3).join(" • ") : (tags[0] ?? "Case Study"));
+  : (tech.length ? tech.slice(0, 3).join(" • ") : (tags[0] ?? "Case Study"));
+
+// Site URL helpers for absolute schema URLs
+const siteOrigin = Astro.site ? (Astro.site as URL).origin : "https://mattblethen.com";
+const projectUrl = `${siteOrigin}/projects/${entry.slug}/`;
+const heroAbs = hero && (hero.startsWith("http") ? hero : `${siteOrigin}${hero}`);
+
+// Safely derive year
+let year: string | null = null;
+if (date) {
+  const d = new Date(date as any);
+  if (!isNaN(d.getTime())) year = String(d.getFullYear());
+}
+
+// JSON-LD for this project (injected into Base via structuredData)
+const projectSchema = {
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  name: title,
+  headline: title,
+  description: summary ?? "Project case study by Matt Blethen",
+  image: heroAbs ?? undefined,
+  datePublished: date ? new Date(date as any).toISOString().slice(0, 10) : undefined,
+  url: projectUrl,
+  creator: { "@type": "Person", name: "Matt Blethen", url: siteOrigin },
+  keywords: tags,
+  ...(client ? { producer: { "@type": "Organization", name: client } } : {}),
+};
+
+// Optional Review schema if testimonial exists
+const reviewSchema = testimonial?.quote
+  ? {
+      "@context": "https://schema.org",
+      "@type": "Review",
+      itemReviewed: { "@type": "CreativeWork", name: title, url: projectUrl },
+      reviewBody: testimonial.quote,
+      author: {
+        "@type": "Person",
+        name: testimonial.name ?? "Client",
+        ...(testimonial.title ? { jobTitle: testimonial.title } : {}),
+      },
+      ...(testimonial.rating
+        ? { reviewRating: { "@type": "Rating", ratingValue: String(testimonial.rating), bestRating: "5", worstRating: "1" } }
+        : {}),
+    }
+  : null;
+
+// Breadcrumbs for this page (consumed by Base to build BreadcrumbList)
+const crumbs: Array<{ name: string; url?: string }> = [
+  { name: "Home", url: `${siteOrigin}/` },
+  { name: "Projects", url: `${siteOrigin}/#projects` },
+  { name: title, url: projectUrl },
+];
+
+// Build structuredData array
+const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSchema];
 ---
 
-<Base title={title} description={summary ?? "Project case study"}>
+<Base
+  title={title}
+  description={summary ?? "Project case study"}
+  image={hero ?? "/images/og-default.jpg"}
+  breadcrumbs={crumbs}
+  structuredData={structuredData}
+>
   <style>
-    /* Scoped to project pages rendered by this route */
-    .project-hero .hero-img img{
-      /* ensure hero image uses theme radius, not circular avatar */
+    /* Layout-only tweaks (keep your visual theme in global.css as you prefer) */
+    .project-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 28px;
+    }
+    @media (max-width: 960px) {
+      .project-grid { grid-template-columns: 1fr; }
+      .project-grid aside { order: 2; }
+    }
+
+    .project-hero .hero-img img {
       border-radius: var(--radius);
       object-fit: cover;
       width: 100%;
@@ -59,37 +141,43 @@ const eyebrow = isDesign
       box-shadow: var(--shadow);
     }
 
-    /* Viewer for portrait flyers: contain on desktop, full-width on mobile */
-    .flyer-viewport{
-      display:flex; align-items:center; justify-content:center;
-      background:#fff; border:1px solid var(--line);
-      border-radius:var(--radius); box-shadow:var(--shadow);
-      padding:12px;
+    /* Minimal testimonial polish; feel free to move/expand in global.css */
+    .testimonial {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 14px;
+      align-items: start;
     }
-    @media (min-width: 981px){
-      .flyer-viewport img{
-        max-height: 88vh;     /* fits inside the screen height */
-        max-width: 100%;
-        width: auto; height: auto;
-        object-fit: contain;  /* no cropping */
-        border-radius:12px;
-        display:block;
-      }
+    .testimonial .avatar {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--line);
     }
-    @media (max-width: 980px){
-      .flyer-viewport img{
-        width:100%; height:auto;  /* tall on phones (preferred) */
-        border-radius:12px;
-        display:block;
-      }
+    .testimonial blockquote {
+      margin: 0;
+      font-size: 1.02rem;
+      line-height: 1.55;
     }
+    .testimonial footer {
+      margin-top: 8px;
+      color: var(--muted, #555);
+      font-size: .95rem;
+    }
+    .stars {
+      display: inline-flex; gap: 2px; margin-left: 8px; font-size: .95rem;
+    }
+    .stars .on { opacity: 1; }
+    .stars .off { opacity: .25; }
   </style>
 
   <div class="wrap project">
+    <!-- Breadcrumbs -->
     <nav class="crumbs" aria-label="breadcrumbs">
       <a href="/">Home</a> &nbsp;/&nbsp; <a href="/#projects">Projects</a> &nbsp;/&nbsp; {title}
     </nav>
 
+    <!-- HERO -->
     <section class="hero project-hero">
       <div>
         <div class="eyebrow">{eyebrow}</div>
@@ -98,9 +186,15 @@ const eyebrow = isDesign
 
         <div class="meta" aria-label="Project meta">
           {client ? <span class="chip">Client: {client}</span> : null}
-          {date ? <span class="chip">Year: {new Date(date).getFullYear()}</span> : null}
+          {year ? <span class="chip">Year: {year}</span> : null}
           {isDesign ? <span class="chip">Format: 8.5×11 in</span> : null}
         </div>
+
+        {links?.live ? (
+          <div class="links">
+            <a class="btn" href={links.live} target="_blank" rel="noreferrer">View Live</a>
+          </div>
+        ) : null}
       </div>
 
       {hero ? (
@@ -110,16 +204,41 @@ const eyebrow = isDesign
       ) : null}
     </section>
 
+    <!-- TWO-COLUMN GRID -->
     <section class="project-grid" aria-label="Project content">
+      <!-- LEFT COLUMN: MDX body + Client Comments + (optional) Flyer -->
       <div>
-        {/* Overview/body */}
         <article class="card">
-          <h2>Overview</h2>
-          {/* The Content body (pure Markdown — no raw HTML needed) */}
           <Content />
         </article>
 
-        {/* Design-only visual: reuse the single hero image as the full flyer */}
+        {testimonial?.quote ? (
+          <article class="card">
+            <h2>Client Comments</h2>
+            <div class="testimonial">
+              {testimonial.photo ? (
+                <img class="avatar" src={testimonial.photo} alt={(testimonial.name ?? "Client") + " — photo"} />
+              ) : (
+                <div class="avatar" style="display:flex;align-items:center;justify-content:center;background:#f2f2f2;">👤</div>
+              )}
+              <div>
+                <blockquote>“{testimonial.quote}”</blockquote>
+                <footer>
+                  <strong>{testimonial.name ?? "Client"}</strong>
+                  {testimonial.title ? <> — {testimonial.title}</> : null}
+                  {typeof testimonial.rating === "number" ? (
+                    <span class="stars" aria-label={`Rating ${testimonial.rating} out of 5`}>
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <span class={i < (testimonial.rating as number) ? "on" : "off"}>★</span>
+                      ))}
+                    </span>
+                  ) : null}
+                </footer>
+              </div>
+            </div>
+          </article>
+        ) : null}
+
         {isDesign && hero ? (
           <article class="card">
             <h2>Full Flyer</h2>
@@ -130,6 +249,7 @@ const eyebrow = isDesign
         ) : null}
       </div>
 
+      <!-- RIGHT SIDEBAR -->
       <aside>
         {services.length ? (
           <div class="card">
@@ -157,12 +277,72 @@ const eyebrow = isDesign
             </div>
           </div>
         ) : null}
+
+        {metrics.length ? (
+          <div class="card">
+            <h2>Outcomes</h2>
+            <ul class="list outcomes-list">
+              {metrics.map((m) => <li>{m}</li>)}
+            </ul>
+          </div>
+        ) : null}
       </aside>
     </section>
 
+    <!-- Modal for gallery (global CSS supplies styles) -->
+    <div id="gallery-modal" class="gallery-modal" hidden aria-hidden="true" role="dialog" aria-label="Image preview">
+      <button class="close" aria-label="Close preview">&times;</button>
+      <img id="gallery-modal-img" alt="" />
+    </div>
+
+    <!-- Bottom nav -->
     <div class="bottom-nav">
       <a href="/#projects">← Back to Projects</a>
       <a href="/contact">Start a project →</a>
     </div>
   </div>
+
+  <!-- Inline, page-safe script for gallery modal -->
+  <script is:inline>
+    (function () {
+      var gallery = document.querySelector('.case-gallery-castle');
+      var modal = document.getElementById('gallery-modal');
+      var modalImg = document.getElementById('gallery-modal-img');
+      var closeBtn = modal ? modal.querySelector('.close') : null;
+
+      if (!gallery || !modal || !modalImg || !closeBtn) return;
+
+      function openModal(src, alt) {
+        modalImg.src = src;
+        modalImg.alt = alt || '';
+        modal.removeAttribute('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+      }
+
+      function closeModal() {
+        modal.setAttribute('hidden', '');
+        modal.setAttribute('aria-hidden', 'true');
+        modalImg.src = '';
+        modalImg.alt = '';
+        document.body.style.overflow = '';
+      }
+
+      gallery.addEventListener('click', function (e) {
+        var img = e.target && e.target.closest && e.target.closest('img');
+        if (!img) return;
+        var full = img.getAttribute('data-full') || img.src;
+        openModal(full, img.alt);
+      });
+
+      closeBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') closeModal();
+      });
+    })();
+  </script>
 </Base>
