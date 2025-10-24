@@ -29,8 +29,8 @@
 
   .grid{display:grid;grid-template-columns:2fr 1fr;gap:22px;margin-top:16px}
   @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
-  .card{border:1px solid var(--line);border-radius:var(--radius);background:#fff;box-shadow:var(--shadow);padding:18px 18px 8px;margin-bottom:18px}
-  .card h2{margin:0 0 8px 0;font-size:1.25rem}
+  .card{border:1px solid var(--line);border-radius:var(--radius);background:#fff;box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+  .card h2{margin:0px 0 10px 0;font-size:1.25rem}
   .card p{color:var(--muted)}
   .list{margin:8px 0 10px 1rem;padding-left:.2rem}
   .list li{margin:.25rem 0}
@@ -156,7 +156,7 @@
     border-bottom:1px solid var(--line);
     overflow:hidden;
   }
-  .thumb img{ width:100%; height:100%; object-fit:cover; }
+  .thumb img{ width:100%; height:100%; object-fit:cover; object-position:top;}
   
   .body{ padding:16px 18px; }
   .kicker{ font-size:.85rem; color:var(--muted); margin:0; }
