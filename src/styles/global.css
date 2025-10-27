@@ -275,12 +275,14 @@
   /* in global.css or project.css */
 .project-hero .hero-img img {
   border-radius: var(--radius);
-  object-fit: cover;
-  width: 100%;
-  height: auto;
-  display: block;
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    max-height: 500px;
+    object-position: top;
 }
 .gallery {
   display: grid;
