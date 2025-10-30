@@ -2,6 +2,8 @@
 import Base from "../layouts/Base.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 import Img from "../components/Img.astro";
+import { Image } from 'astro:assets';
+import profileSrc from '../assets/images/profile.png';
 
 // Load all projects
 const entries = await getCollection("projects");
@@ -291,17 +293,17 @@ const faq = {
 
       <div class="hero-img hero-img--clean">
         <figure class="profile-wrap" aria-label="Profile photo">
-          <Img
-  class="profile-photo"
-  src={profilePath}
-  alt="Profile photo of Matt Blethen"
-  width="380"
-  height="507"
-  sizes="(max-width: 1024px) 45vw, 380px"
-  loading="eager"
-  decoding="async"
-/>
-
+          <Image
+            src={profileSrc}
+            alt="Profile photo of Matt Blethen"
+            widths={[256, 320, 380]}
+            format="webp"
+            sizes="(max-width: 1024px) 45vw, 380px"
+            fetchpriority="high"
+            loading="eager"
+            decoding="async"
+            class="profile-photo"
+          />
         </figure>
       </div>
     </section>
@@ -343,16 +345,15 @@ const faq = {
           <article class="card">
             <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
               <Img
-  src={c.img}
-  alt={c.title + " preview"}
-  width="1200"
-  height="675"
-  sizes="(max-width: 900px) 100vw, 900px"
-  loading="lazy"
-  decoding="async"
-  style="display:block"
-/>
-
+                src={c.img}
+                alt={c.title + " preview"}
+                width="1200"
+                height="675"
+                sizes="(max-width: 900px) 100vw, 900px"
+                loading="lazy"
+                decoding="async"
+                style="display:block"
+              />
             </a>
             <div class="body">
               <p class="kicker">{c.kicker}</p>
@@ -382,16 +383,15 @@ const faq = {
             <article class="card compact" style="--card-scale:0.94">
               <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
                 <Img
-  src={c.img}
-  alt={c.title + " preview"}
-  width="1200"
-  height="675"
-  sizes="(max-width: 900px) 100vw, 900px"
-  loading="lazy"
-  decoding="async"
-  style="display:block"
-/>
-
+                  src={c.img}
+                  alt={c.title + " preview"}
+                  width="1200"
+                  height="675"
+                  sizes="(max-width: 900px) 100vw, 900px"
+                  loading="lazy"
+                  decoding="async"
+                  style="display:block"
+                />
               </a>
               <div class="body">
                 <p class="kicker">Design</p>
@@ -503,7 +503,7 @@ const faq = {
       <details>
         <summary>How long does it take to complete a new Shopify store?</summary>
         <p>
-          Most custom Shopify builds take 4–8 weeks, depending on content readiness, design complexity,
+          Most custom Shopify stores take 4–8 weeks, depending on content readiness, design complexity,
           and feedback turnaround time.
         </p>
       </details>

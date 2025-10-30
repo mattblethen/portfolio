@@ -10,19 +10,23 @@
     "check": "astro check",
     "astro": "astro",
     "vercel-build": "astro build --verbose",
-    "capture": "node capture.js"
+    "capture": "node capture.js",
+    "img:opt": "node scripts/optimize-images.mjs \"public/images/**/*.{png,jpg,jpeg}\" \"src/assets/images/**/*.{png,jpg,jpeg}\""
   },
   "dependencies": {
-    "astro": "^5.15.3",
     "@astrojs/check": "^0.9.5",
+    "astro": "^5.15.3",
     "puppeteer": "^24.26.0",
-    "sharp": "^0.34.4",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@astrojs/mdx": "^4.3.9",
     "@tailwindcss/vite": "^4.1.16",
+    "glob": "^11.0.3",
+    "sharp": "^0.34.4",
     "tailwindcss": "^4.1.16"
   },
-  "engines": { "node": "20.x" }
+  "engines": {
+    "node": "20.x"
+  }
 }
