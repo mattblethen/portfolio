@@ -1,0 +1,86 @@
+---
+import { Image } from "astro:assets";
+
+/**
+ * Props:
+ * - src: static import (recommended) OR string path from /public
+ * - alt: string
+ * - width, height: numbers for fixed-size image (CLS-safe)
+ * - widths: number[] for responsive srcset (alternative to width/height)
+ * - sizes: responsive sizes string
+ * - format: "avif" | "webp" | "png" | "jpeg" (optional)
+ * - quality, fit, position: transform options
+ * - class, style, loading, decoding: standard attrs
+ */
+const {
+  src,
+  alt = "",
+  // Fixed-size (CLS-safe)
+  width,
+  height,
+  // Responsive (srcset)
+  widths,
+  sizes = "(max-width: 768px) 100vw, 1200px",
+
+  // Perf & attrs
+  loading = "lazy",
+  decoding = "async",
+  class: className = "",
+  style = "",
+
+  // Transform options (valid for astro:assets)
+  format,          // "avif" | "webp" | "png" | "jpeg"
+  quality,         // number 1..100
+  fit,             // e.g. "cover" | "contain" | "fill" | "inside" | "outside"
+  position,        // e.g. "center", "top", "left 10px top 10px", etc.
+} = Astro.props;
+
+const isStringSrc = typeof src === "string";
+---
+
+{isStringSrc ? (
+  /* For /public paths or external URLs (no build-time optimization) */
+  <img
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    class={className}
+    loading={loading}
+    decoding={decoding}
+    style={style}
+  />
+) : widths ? (
+  /* Responsive, optimized output with srcset */
+  <Image
+    src={src}
+    alt={alt}
+    widths={widths}
+    sizes={sizes}
+    loading={loading}
+    decoding={decoding}
+    format={format}
+    quality={quality}
+    fit={fit}
+    position={position}
+    class={className}
+    style={style}
+  />
+) : (
+  /* Fixed-size, optimized output (CLS-safe) */
+  <Image
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    sizes={sizes}
+    loading={loading}
+    decoding={decoding}
+    format={format}
+    quality={quality}
+    fit={fit}
+    position={position}
+    class={className}
+    style={style}
+  />
+)}

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
   :root{
     --bg:#ffffff;
     --text:#111827;
@@ -397,3 +398,113 @@
   .list{
     list-style:disc;
   }
+  /* Layout-only tweaks (keep your visual theme in global.css as you prefer) */
+    .project-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 28px;
+    }
+    @media (max-width: 960px) {
+      .project-grid { grid-template-columns: 1fr; }
+      .project-grid aside { order: 2; }
+    }
+
+    .project-hero .hero-img img {
+      border-radius: var(--radius);
+      object-fit: cover;
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    /* Avatar styles must target both <img.avatar> and <picture><img> cases */
+    .testimonial .avatar,
+    .testimonial .avatar img {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      display: block;
+    }
+    .testimonial {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .testimonial blockquote {
+      margin: 0;
+      font-size: 1.02rem;
+      line-height: 1.55;
+    }
+    .testimonial footer {
+      margin-top: 8px;
+      color: var(--muted, #555);
+      font-size: .95rem;
+    }
+    .stars {
+      display: inline-flex; gap: 2px; margin-left: 8px; font-size: .95rem;
+    }
+    .stars .on { opacity: 1; }
+    .stars .off { opacity: .25; }
+
+    .hero-img { display: grid; place-items: center; }
+
+.profile-wrap {
+  position: relative;
+  width: clamp(220px, 28vw, 380px);
+  aspect-ratio: 3 / 4;
+  border-radius: 50% / 55%;
+  overflow: hidden;
+  background: linear-gradient(181deg, #ffec02 0%, #c50000 100%);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Make sure <picture> behaves like the old <img> */
+.profile-wrap picture { display: block; width: 100%; height: 100%; }
+
+/* Keep the photo above the glare, below the rim border */
+.profile-wrap img.profile-photo {
+  position: relative;
+  z-index: 1;              /* above ::before */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* Soft glare, now UNDER the image */
+.profile-wrap::before {
+  content: "";
+  position: absolute; inset: 0;
+  z-index: 0;              /* <- was 1 */
+  /* dialed back brightness so it doesn’t wash out */
+  background: radial-gradient(100% 100% at 50% 20%,
+              rgba(255,255,255,0.25), rgba(0,0,0,0.0));
+}
+
+/* Decorative rim on top */
+.profile-wrap::after {
+  content: "";
+  position: absolute; inset: 0;
+  z-index: 2;
+  border-left: 4px solid rgba(0,0,0,0.1);
+  border-right: 4px solid rgba(0,0,0,0.1);
+  border-bottom: 4px solid rgba(0,0,0,0.1);
+  border-top: none;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .profile-wrap { width: clamp(200px, 52vw, 320px); }
+}
+
+/* Keep hero container overrides */
+.hero--cleanphoto .hero-img,
+.hero-img--clean { border: none; border-radius: 0; overflow: visible; box-shadow: none; background: transparent; }
+.hero--cleanphoto .hero-img img { border-radius: 0; box-shadow: none; }

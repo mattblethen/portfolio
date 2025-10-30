@@ -36,6 +36,13 @@ testimonial:
   rating: 5
 ---
 
+import Img from "@/components/Img.astro";
+import homeDesktop from "@/assets/images/projects/inli10prints/01-home-desktop.png";
+import newArrivals from "@/assets/images/projects/inli10prints/02-new-arrivals-desktop.png";
+import aboutDesktop from "@/assets/images/projects/inli10prints/04-about-desktop.png";
+import mobileMenu from "@/assets/images/projects/inli10prints/04-mobile-menu.png";
+import homeMobile from "@/assets/images/projects/inli10prints/05-home-mobile.png";
+
 ## Overview
 
 The inli10 Prints storefront was created to showcase visionary digital artwork through a custom Shopify 2.0 theme built from the ground up for print-on-demand.  
@@ -47,56 +54,76 @@ The result is a stunning, cohesive experience that brings the artwork to life ac
 <h2 style="margin-top:20px;">Gallery</h2>
 <div class="case-gallery-castle">
   <figure class="tile">
-    <img
-      src="/images/projects/inli10prints/01-home-desktop.png"
+    <Img
+      src={homeDesktop}
       alt="Homepage showcasing hero lifestyle imagery and featured product grid"
+      widths={[600, 900, 1200, 1600]}
+      sizes="(max-width: 900px) 100vw, 1200px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/inli10prints/01-home-desktop.png"
+      class="w-full object-cover aspect-[16/9]"
+      style="display:block;"
+      data-full={homeDesktop.src}
     />
     <figcaption>Homepage — Hero layout and featured products</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/inli10prints/02-new-arrivals-desktop.png"
+    <Img
+      src={newArrivals}
       alt="New Arrivals collection displaying rugs, tapestries, and blankets with color harmony"
+      widths={[600, 900, 1200, 1600]}
+      sizes="(max-width: 900px) 100vw, 1200px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/inli10prints/02-new-arrivals-desktop.png"
+      class="w-full object-cover aspect-[16/9]"
+      style="display:block;"
+      data-full={newArrivals.src}
     />
     <figcaption>Collection — New Arrivals with cohesive design presentation</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/inli10prints/04-about-desktop.png"
+    <Img
+      src={aboutDesktop}
       alt="About page featuring brand story and artistic mural imagery"
+      widths={[600, 900, 1200, 1600]}
+      sizes="(max-width: 900px) 100vw, 1200px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/inli10prints/04-about-desktop.png"
+      class="w-full object-cover aspect-[16/9]"
+      style="display:block;"
+      data-full={aboutDesktop.src}
     />
     <figcaption>About — Brand narrative and visual philosophy</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/inli10prints/04-mobile-menu.png"
+    <Img
+      src={mobileMenu}
       alt="Mobile navigation menu displaying product categories and social icons"
+      widths={[480, 768, 1024, 1440]}
+      sizes="(max-width: 768px) 100vw, 768px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/inli10prints/04-mobile-menu.png"
+      class="w-full object-cover aspect-[9/16]"
+      style="display:block;"
+      data-full={mobileMenu.src}
     />
     <figcaption>Mobile navigation menu</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/inli10prints/05-home-mobile.png"
+    <Img
+      src={homeMobile}
       alt="Mobile homepage showing hero banner and responsive product grid"
+      widths={[480, 768, 1024, 1440]}
+      sizes="(max-width: 768px) 100vw, 768px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/inli10prints/05-home-mobile.png"
+      class="w-full object-cover aspect-[9/16]"
+      style="display:block;"
+      data-full={homeMobile.src}
     />
     <figcaption>Homepage (mobile)</figcaption>
   </figure>

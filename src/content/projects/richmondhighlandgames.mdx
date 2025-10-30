@@ -34,6 +34,13 @@ testimonial:
   rating: 5
 ---
 
+import Img from "@/components/Img.astro";
+import homeDesktop from "@/assets/images/projects/rkyhighlandgames/01-home-desktop.png";
+import scheduleDesktop from "@/assets/images/projects/rkyhighlandgames/02-schedule-desktop.png";
+import sponsorsDesktop from "@/assets/images/projects/rkyhighlandgames/04-sponsors-desktop.png";
+import homeMobile from "@/assets/images/projects/rkyhighlandgames/08-home-mobile.png";
+import mobileMenu from "@/assets/images/projects/rkyhighlandgames/mobile-menu.png";
+
 ## Overview
 
 This lightweight WordPress theme was built to do one job well: **drive event sign-ups** while giving visitors the essentials—date, location, schedule, and sponsor info.  
@@ -42,56 +49,76 @@ A minimalist component set (hero CTA, schedule block, sponsor tiers, and form se
 <h2 style="margin-top:20px;">Gallery</h2>
 <div class="case-gallery-castle">
   <figure class="tile">
-    <img
-      src="/images/projects/rkyhighlandgames/01-home-desktop.png"
+    <Img
+      src={homeDesktop}
       alt="Homepage hero with plaid-styled CTA for event sign-ups"
+      widths={[600, 900, 1200, 1600]}
+      sizes="(max-width: 900px) 100vw, 1200px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/rkyhighlandgames/01-home-desktop.png"
+      class="w-full object-cover aspect-[16/9]"
+      style="display:block;"
+      data-full={homeDesktop.src}
     />
     <figcaption>Homepage — Hero & primary CTA</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/rkyhighlandgames/02-schedule-desktop.png"
+    <Img
+      src={scheduleDesktop}
       alt="Events page with simple registration form fields"
+      widths={[600, 900, 1200, 1600]}
+      sizes="(max-width: 900px) 100vw, 1200px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/rkyhighlandgames/02-schedule-desktop.png"
+      class="w-full object-cover aspect-[16/9]"
+      style="display:block;"
+      data-full={scheduleDesktop.src}
     />
     <figcaption>Events — Registration form</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/rkyhighlandgames/04-sponsors-desktop.png"
+    <Img
+      src={sponsorsDesktop}
       alt="Sponsor tiers displayed as scannable cards on a plaid background"
+      widths={[600, 900, 1200, 1600]}
+      sizes="(max-width: 900px) 100vw, 1200px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/rkyhighlandgames/04-sponsors-desktop.png"
+      class="w-full object-cover aspect-[16/9]"
+      style="display:block;"
+      data-full={sponsorsDesktop.src}
     />
     <figcaption>Sponsor tiers — Bronze / Silver / Gold</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/rkyhighlandgames/08-home-mobile.png"
+    <Img
+      src={homeMobile}
       alt="Mobile homepage with large headline and plaid CTA button"
+      widths={[480, 768, 1024, 1440]}
+      sizes="(max-width: 768px) 100vw, 768px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/rkyhighlandgames/08-home-mobile.png"
+      class="w-full object-cover aspect-[9/16]"
+      style="display:block;"
+      data-full={homeMobile.src}
     />
     <figcaption>Homepage (mobile)</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/rkyhighlandgames/mobile-menu.png"
+    <Img
+      src={mobileMenu}
       alt="Mobile slide-out menu with clear section links"
+      widths={[480, 768, 1024, 1440]}
+      sizes="(max-width: 768px) 100vw, 768px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/rkyhighlandgames/mobile-menu.png"
+      class="w-full object-cover aspect-[9/16]"
+      style="display:block;"
+      data-full={mobileMenu.src}
     />
     <figcaption>Mobile navigation</figcaption>
   </figure>

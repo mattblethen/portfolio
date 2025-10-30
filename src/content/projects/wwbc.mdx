@@ -37,6 +37,14 @@ testimonial:
   rating: 5
 ---
 
+import Img from "@/components/Img.astro";
+import scentShowcase from "@/assets/images/projects/WWBC/02-scent-showcase-desktop.png";
+import oilsCollection from "@/assets/images/projects/WWBC/wildwestbeardco-com-collections-beard-oils-20251024-130436.png";
+import westernBreezeCollection from "@/assets/images/projects/WWBC/wildwestbeardco-com-collections-western-breeze-20251024-130137.png";
+import westernBreezePdp from "@/assets/images/projects/WWBC/wildwestbeardco-com-products-western-breeze-1oz-30ml-20251024-130421.png";
+import homeMobile from "@/assets/images/projects/WWBC/04-home-mobile.png";
+import mobileMenu from "@/assets/images/projects/WWBC/05-mobile-menu-open.png";
+
 ## Overview
 
 The **Wild West Beard Co.** storefront was reimagined from the ground up as a **custom Shopify 2.0 theme** designed to replace a legacy WordPress site.  
@@ -52,72 +60,94 @@ The build emphasizes both **brand narrative** and **conversion flow**, with feat
 
 The result is a modern, scalable Shopify ecosystem that preserves the brand’s Western soul while dramatically improving usability, speed, and storytelling impact.
 
-
-
 <h2 style="margin-top:20px;">Gallery</h2>
 <div class="case-gallery-castle">
   <figure class="tile">
-    <img
-      src="/images/projects/WWBC/02-scent-showcase-desktop.png"
+    <Img
+      src={scentShowcase}
       alt="Scent Showcase desktop layout highlighting signature scents with immersive photography"
+      widths={[600, 900, 1200, 1600]}
+      sizes="(max-width: 900px) 100vw, 1200px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/WWBC/02-scent-showcase-desktop.png"
+      class="w-full object-cover aspect-[16/9]"
+      style="display:block;"
+      data-full={scentShowcase.src}
     />
     <figcaption>Scent Showcase — immersive storytelling for each scent family</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/WWBC/wildwestbeardco-com-collections-beard-oils-20251024-130436.png"
+    <Img
+      src={oilsCollection}
       alt="Beard oils collection displaying product grid and PNW-inspired branding"
+      widths={[600, 900, 1200, 1600]}
+      sizes="(max-width: 900px) 100vw, 1200px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/WWBC/wildwestbeardco-com-collections-beard-oils-20251024-130436.png"
+      class="w-full object-cover aspect-[16/9]"
+      style="display:block;"
+      data-full={oilsCollection.src}
     />
     <figcaption>Collection — beard oils grid with consistent Western visual tone</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/WWBC/wildwestbeardco-com-collections-western-breeze-20251024-130137.png"
+    <Img
+      src={westernBreezeCollection}
       alt="Western Breeze scent page featuring ingredient showcase and paired products"
+      widths={[600, 900, 1200, 1600]}
+      sizes="(max-width: 900px) 100vw, 1200px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/WWBC/wildwestbeardco-com-collections-western-breeze-20251024-130137.png"
+      class="w-full object-cover aspect-[16/9]"
+      style="display:block;"
+      data-full={westernBreezeCollection.src}
     />
     <figcaption>Scent page — dynamic ingredient highlights and paired product logic</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/WWBC/wildwestbeardco-com-products-western-breeze-1oz-30ml-20251024-130421.png"
+    <Img
+      src={westernBreezePdp}
       alt="Product page for Western Breeze beard oil showing metafield-driven combo offer"
+      widths={[600, 900, 1200, 1600]}
+      sizes="(max-width: 900px) 100vw, 1200px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/WWBC/wildwestbeardco-com-products-western-breeze-1oz-30ml-20251024-130421.png"
+      class="w-full object-cover aspect-[16/9]"
+      style="display:block;"
+      data-full={westernBreezePdp.src}
     />
     <figcaption>Product page — metafield-powered combo logic and ingredient breakdown</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/WWBC/04-home-mobile.png"
+    <Img
+      src={homeMobile}
       alt="Mobile homepage showing signature scent section and responsive layout"
+      widths={[480, 768, 1024, 1440]}
+      sizes="(max-width: 768px) 100vw, 768px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/WWBC/04-home-mobile.png"
+      class="w-full object-cover aspect-[9/16]"
+      style="display:block;"
+      data-full={homeMobile.src}
     />
     <figcaption>Homepage (mobile) — signature scents and adaptive content blocks</figcaption>
   </figure>
 
   <figure class="tile">
-    <img
-      src="/images/projects/WWBC/05-mobile-menu-open.png"
+    <Img
+      src={mobileMenu}
       alt="Mobile menu open view displaying navigation items and social icons"
+      widths={[480, 768, 1024, 1440]}
+      sizes="(max-width: 768px) 100vw, 768px"
       loading="lazy"
       decoding="async"
-      data-full="/images/projects/WWBC/05-mobile-menu-open.png"
+      class="w-full object-cover aspect-[9/16]"
+      style="display:block;"
+      data-full={mobileMenu.src}
     />
     <figcaption>Mobile navigation — minimalist UX for fast browsing</figcaption>
   </figure>

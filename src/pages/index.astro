@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
+import Img from "../components/Img.astro";
 
 // Load all projects
 const entries = await getCollection("projects");
@@ -12,7 +13,24 @@ entries.sort((a, b) => {
   return db - da;
 });
 
-// Fallback preview image
+// Map all files under /src/assets/images/** so we can resolve legacy "/images/**" strings
+const assetUrls = import.meta.glob("../assets/images/**/*", {
+  eager: true,
+  import: "default",
+}) as Record<string, string>;
+
+function resolveAssetUrl(input?: string): string | undefined {
+  if (!input) return undefined;
+  if (/^https?:\/\//i.test(input)) return input; // absolute URL
+  if (input.startsWith("/images/")) {
+    // Try to find corresponding asset in src/assets/images/**
+    const key = ".." + input.replace("/images", "/assets/images"); // "../assets/images/..."
+    return assetUrls[key] ?? input; // fallback to public path if not found
+  }
+  return input;
+}
+
+// Fallback preview image (data URI)
 const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent(
   `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'>
     <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
@@ -30,9 +48,10 @@ const toCard = ({ slug, data }: CollectionEntry<"projects">) => {
   const title = data.title ?? "Untitled Project";
   const tags = ((data.tags ?? []) as string[]).slice(0, 4);
   const url = `/projects/${slug}/`;
+  const hero = (data.hero as string | undefined) ?? placeholder;
   return {
     url,
-    img: data.hero ?? placeholder,
+    img: resolveAssetUrl(hero) ?? placeholder,
     title,
     summary: data.summary ?? "",
     tags,
@@ -44,16 +63,16 @@ const toCard = ({ slug, data }: CollectionEntry<"projects">) => {
 
 // Selected Graphic Design (tagged "design" or "graphic")
 const designCards = entries
-  .filter((entry: CollectionEntry<"projects">) => {
-    const t = ((entry.data.tags ?? []) as string[]).map((x: string) => x.toLowerCase());
+  .filter((entry) => {
+    const t = ((entry.data.tags ?? []) as string[]).map((x) => x.toLowerCase());
     return t.includes("design") || t.includes("graphic");
   })
   .map(toCard);
 
 // Web-first list excludes those design-only items
 const webCards = entries
-  .filter((entry: CollectionEntry<"projects">) => {
-    const t = ((entry.data.tags ?? []) as string[]).map((x: string) => x.toLowerCase());
+  .filter((entry) => {
+    const t = ((entry.data.tags ?? []) as string[]).map((x) => x.toLowerCase());
     return !(t.includes("design") || t.includes("graphic"));
   })
   .map(toCard);
@@ -66,7 +85,7 @@ const page = {
 };
 
 // ---------- Local & Nationwide SEO JSON-LD ----------
-const siteUrl = "https://mattblethen.com"; // update this
+const siteUrl = "https://mattblethen.com"; // update this if needed
 const businessName = "Matt Blethen — Shopify & Web Developer";
 const kyCities = [
   "Richmond, KY",
@@ -81,12 +100,19 @@ const kyCities = [
   "Irvine, KY",
 ];
 
+function toAbs(u?: string) {
+  if (!u) return undefined;
+  if (/^https?:\/\//i.test(u)) return u;
+  return `${siteUrl}${u.startsWith("/") ? u : `/${u}`}`;
+}
+
+const profilePath = resolveAssetUrl("/images/profile.png") ?? "/images/profile.png";
 const professionalService = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   name: businessName,
   url: siteUrl,
-  image: `${siteUrl}/images/profile.png`,
+  image: toAbs("/images/profile.png"),
   description:
     "Nationwide remote Shopify development and web design, with local availability in Richmond, Lexington, and Central Kentucky.",
   serviceArea: { "@type": "Country", name: "United States" },
@@ -151,80 +177,88 @@ const faq = {
         text:
           "Ecommerce brands on Shopify and service businesses—contractors, real estate, medical/dental, veterinary, and trades—needing fast, clear websites that convert.",
       },
-      
-    },{
-  "@type": "Question",
-  "name": "What is your process for new web projects?",
-  "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Each project begins with discovery, followed by design mockups, then development and testing. Clients receive regular updates and clear deliverables at every stage."
-  }
-},
-{
-  "@type": "Question",
-  "name": "Do you offer maintenance or support after launch?",
-  "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes. Ongoing site updates, performance optimization, and feature improvements are available after launch for Shopify and custom websites."
-  }
-},
-{
-  "@type": "Question",
-  "name": "Can you redesign my existing Shopify or WordPress site?",
-  "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Absolutely. I can modernize your current Shopify or WordPress site to improve performance, accessibility, and design consistency without losing SEO value."
-  }
-},
-{
-  "@type": "Question",
-  "name": "What does a typical project cost?",
-  "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Most full Shopify builds range between $3,000 and $8,000, while smaller design-only or optimization projects start around $1,000 depending on complexity."
-  }
-},
-{
-  "@type": "Question",
-  "name": "Do you handle content or photography?",
-  "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "I coordinate with photographers or provide remote workflows to ensure product and lifestyle images match your brand aesthetic and platform requirements."
-  }
-},
-{
-  "@type": "Question",
-  "name": "Can you help with SEO and marketing?",
-  "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes. I include technical SEO setup and can integrate Google Analytics, Search Console, and marketing automation tools for long-term growth."
-  }
-},
-{
-  "@type": "Question",
-  "name": "Do you build custom apps or integrations for Shopify?",
-  "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "I create custom Liquid sections, advanced automations, and API integrations with tools like Klaviyo and ShipStation. Full app builds are available by request."
-  }
-},
-{
-  "@type": "Question",
-  "name": "How long does it take to complete a new Shopify store?",
-  "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Most custom Shopify stores are completed within 4 to 8 weeks, depending on scope, content readiness, and feedback turnaround time."
-  }
-},
-{
-  "@type": "Question",
-  "name": "Do you require a contract or deposit?",
-  "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes. A signed agreement and deposit secure your project slot. The remaining balance is paid in stages or upon completion."
-  }
-}
-
+    },
+    {
+      "@type": "Question",
+      name: "What is your process for new web projects?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Each project begins with discovery, followed by design mockups, then development and testing. Clients receive regular updates and clear deliverables at every stage.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Do you offer maintenance or support after launch?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Yes. Ongoing site updates, performance optimization, and feature improvements are available after launch for Shopify and custom websites.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can you redesign my existing Shopify or WordPress site?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Absolutely. I can modernize your current Shopify or WordPress site to improve performance, accessibility, and design consistency without losing SEO value.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What does a typical project cost?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Most full Shopify builds range between $3,000 and $8,000, while smaller design-only or optimization projects start around $1,000 depending on complexity.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Do you handle content or photography?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "I coordinate with photographers or provide remote workflows to ensure product and lifestyle images match your brand aesthetic and platform requirements.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can you help with SEO and marketing?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Yes. I include technical SEO setup and can integrate Google Analytics, Search Console, and marketing automation tools for long-term growth.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Do you build custom apps or integrations for Shopify?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "I create custom Liquid sections, advanced automations, and API integrations with tools like Klaviyo and ShipStation. Full app builds are available by request.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How long does it take to complete a new Shopify store?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Most custom Shopify stores are completed within 4 to 8 weeks, depending on scope, content readiness, and feedback turnaround time.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Do you require a contract or deposit?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Yes. A signed agreement and deposit secure your project slot. The remaining balance is paid in stages or upon completion.",
+      },
+    },
   ],
 };
 ---
@@ -257,13 +291,14 @@ const faq = {
 
       <div class="hero-img hero-img--clean">
         <figure class="profile-wrap" aria-label="Profile photo">
-          <img
-            src="/images/profile.png"
-            alt="Profile photo of Matt Blethen"
-            width="1500"
-            height="2000"
-            loading="eager"
-            decoding="async"
+          <Img
+            class="profile-photo"
+  src={profilePath}
+  alt="Profile photo of Matt Blethen"
+  width={1500}
+  height={2000}
+  loading="eager"
+  decoding="async"
           />
         </figure>
       </div>
@@ -305,7 +340,15 @@ const faq = {
         {webCards.map((c) => (
           <article class="card">
             <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
-              <img src={c.img} alt={c.title + " preview"} width="1200" height="675" loading="lazy" />
+              <Img
+                src={c.img}
+                alt={c.title + " preview"}
+                widths={[600, 900, 1200, 1600]}
+                sizes="(max-width: 900px) 100vw, 1200px"
+                loading="lazy"
+                decoding="async"
+                style="display:block"
+              />
             </a>
             <div class="body">
               <p class="kicker">{c.kicker}</p>
@@ -334,7 +377,15 @@ const faq = {
           {designCards.map((c) => (
             <article class="card compact" style="--card-scale:0.94">
               <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
-                <img src={c.img} alt={c.title + " design preview"} width="1200" height="675" loading="lazy" />
+                <Img
+                  src={c.img}
+                  alt={c.title + " design preview"}
+                  widths={[600, 900, 1200, 1600]}
+                  sizes="(max-width: 900px) 100vw, 1200px"
+                  loading="lazy"
+                  decoding="async"
+                  style="display:block"
+                />
               </a>
               <div class="body">
                 <p class="kicker">Design</p>
@@ -401,71 +452,62 @@ const faq = {
         <p>Absolutely—theme refactors, accessibility fixes, and migrations to Shopify or Astro.</p>
       </details>
       <details>
-  <summary>What is your process for new web projects?</summary>
-  <p>
-    Every project starts with discovery—clarifying goals, audiences, and design direction.
-    From there, I create a plan, design mockups, and move into development. You'll get regular
-    updates and clear deliverables at every milestone.
-  </p>
-</details>
-
-<details>
-  <summary>Do you offer maintenance or support after launch?</summary>
-  <p>
-    Yes. I provide ongoing updates, performance monitoring, and feature enhancements after launch.
-    This ensures your Shopify store or website continues to run fast and stay secure.
-  </p>
-</details>
-
-<details>
-  <summary>Can you redesign my existing Shopify or WordPress site?</summary>
-  <p>
-    Absolutely. I can rebuild your existing site on a modern framework—keeping your content and SEO value
-    while improving speed, accessibility, and conversion performance.
-  </p>
-</details>
-
-<details>
-  <summary>What does a typical project cost?</summary>
-  <p>
-    Pricing depends on scope, features, and design complexity. Most full Shopify builds range between
-    $3,000–$8,000, while smaller design-only or optimization projects start around $1,000.
-  </p>
-</details>
-
-<details>
-  <summary>Do you handle content or product photography?</summary>
-  <p>
-    I can coordinate with your photographer or recommend remote-friendly workflows for product images,
-    lifestyle shots, and content creation that match your brand’s tone and colors.
-  </p>
-</details>
-
-<details>
-  <summary>Can you help with SEO and marketing setup?</summary>
-  <p>
-    Yes. All sites are optimized for technical SEO by default, and I can integrate Google Analytics,
-    Search Console, and meta data. I also offer ongoing SEO and ad campaign support upon request.
-  </p>
-</details>
-
-
-<details>
-  <summary>How long does it take to complete a new Shopify store?</summary>
-  <p>
-    Most custom Shopify builds take 4–8 weeks, depending on content readiness, design complexity,
-    and feedback turnaround time.
-  </p>
-</details>
-
-<details>
-  <summary>Do you require a contract or deposit?</summary>
-  <p>
-    Yes. A signed project agreement and 30–50% deposit secure your spot in my schedule.
-    The balance is due at key milestones or on completion.
-  </p>
-</details>
-
+        <summary>What is your process for new web projects?</summary>
+        <p>
+          Every project starts with discovery—clarifying goals, audiences, and design direction.
+          From there, I create a plan, design mockups, and move into development. You'll get regular
+          updates and clear deliverables at every milestone.
+        </p>
+      </details>
+      <details>
+        <summary>Do you offer maintenance or support after launch?</summary>
+        <p>
+          Yes. I provide ongoing updates, performance monitoring, and feature enhancements after launch.
+          This ensures your Shopify store or website continues to run fast and stay secure.
+        </p>
+      </details>
+      <details>
+        <summary>Can you redesign my existing Shopify or WordPress site?</summary>
+        <p>
+          Absolutely. I can rebuild your existing site on a modern framework—keeping your content and SEO value
+          while improving speed, accessibility, and conversion performance.
+        </p>
+      </details>
+      <details>
+        <summary>What does a typical project cost?</summary>
+        <p>
+          Pricing depends on scope, features, and design complexity. Most full Shopify builds range between
+          $3,000–$8,000, while smaller design-only or optimization projects start around $1,000.
+        </p>
+      </details>
+      <details>
+        <summary>Do you handle content or product photography?</summary>
+        <p>
+          I can coordinate with your photographer or recommend remote-friendly workflows for product images,
+          lifestyle shots, and content creation that match your brand’s tone and colors.
+        </p>
+      </details>
+      <details>
+        <summary>Can you help with SEO and marketing setup?</summary>
+        <p>
+          Yes. All sites are optimized for technical SEO by default, and I can integrate Google Analytics,
+          Search Console, and meta data. I also offer ongoing SEO and ad campaign support upon request.
+        </p>
+      </details>
+      <details>
+        <summary>How long does it take to complete a new Shopify store?</summary>
+        <p>
+          Most custom Shopify builds take 4–8 weeks, depending on content readiness, design complexity,
+          and feedback turnaround time.
+        </p>
+      </details>
+      <details>
+        <summary>Do you require a contract or deposit?</summary>
+        <p>
+          Yes. A signed project agreement and 30–50% deposit secure your spot in my schedule.
+          The balance is due at key milestones or on completion.
+        </p>
+      </details>
     </section>
 
     <!-- Contact CTA -->
@@ -477,7 +519,6 @@ const faq = {
       </p>
       <div class="cta-row" style="display:flex; gap:12px; flex-wrap:wrap;">
         <a class="cta" href="/contact">Start a Project</a>
-        
       </div>
     </section>
   </main>
@@ -490,7 +531,7 @@ const faq = {
       aspect-ratio: 3 / 4;
       border-radius: 50% / 55%;
       overflow: hidden;
-          background: linear-gradient(181deg, #ffec02 0%, #c50000 100%);
+      background: linear-gradient(181deg, #ffec02 0%, #c50000 100%);
       box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
     .profile-wrap::before {

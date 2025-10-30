@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { getCollection, render } from "astro:content";
+import Img from "../../components/Img.astro";
 
 // Build all project pages at build time
 export async function getStaticPaths() {
@@ -14,7 +15,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 
-// Pull common fields from frontmatter
+// Frontmatter fields
 const {
   title,
   summary,
@@ -30,7 +31,7 @@ const {
 } = entry.data as {
   title: string;
   summary?: string;
-  hero?: string;
+  hero?: string;  // legacy public path ok
   client?: string;
   date?: string | Date;
   tags?: string[];
@@ -39,19 +40,38 @@ const {
   links?: { live?: string };
   metrics?: string[];
   testimonial?: {
-    name?: string;       // e.g., "Jane Smith"
-    title?: string;      // e.g., "Marketing Director, The Castle Jewelry"
-    photo?: string;      // e.g., "/images/clients/jane.jpg"
-    quote?: string;      // the review text
-    rating?: number;     // 1..5 (optional)
+    name?: string;
+    title?: string;
+    photo?: string;
+    quote?: string;
+    rating?: number;
   } | null;
 };
+
+// Resolve assets whether they live in /public/images or /src/assets/images
+const assetUrls = import.meta.glob("../../assets/images/**/*", {
+  eager: true,
+  import: "default",
+}) as Record<string, string>;
+
+function resolveAssetUrl(input?: string): string | undefined {
+  if (!input) return undefined;
+  if (/^https?:\/\//i.test(input)) return input; // absolute
+  if (input.startsWith("/images/")) {
+    const key = "../../assets" + input; // -> ../../assets/images/...
+    return assetUrls[key] ?? input;     // fall back to public path
+  }
+  return input;
+}
+
+const heroUrl = resolveAssetUrl(hero);
+const testimonialPhotoUrl = resolveAssetUrl(testimonial?.photo);
 
 // Detect design-style projects (print/graphic)
 const t = tags.map((x) => x.toLowerCase());
 const isDesign = t.includes("design") || t.includes("graphic") || t.includes("print");
 
-// Build eyebrow text (lightweight)
+// Eyebrow text
 const eyebrow = isDesign
   ? "Graphic Design • Print"
   : (tech.length ? tech.slice(0, 3).join(" • ") : (tags[0] ?? "Case Study"));
@@ -59,7 +79,16 @@ const eyebrow = isDesign
 // Site URL helpers for absolute schema URLs
 const siteOrigin = Astro.site ? (Astro.site as URL).origin : "https://mattblethen.com";
 const projectUrl = `${siteOrigin}/projects/${entry.slug}/`;
-const heroAbs = hero && (hero.startsWith("http") ? hero : `${siteOrigin}${hero}`);
+
+// Ensure absolute image URL for structured data
+function toAbsolute(u: unknown) {
+  if (!u) return undefined;
+  if (typeof u === "object" && u !== null && "src" in (u as any)) u = (u as any).src;
+  const s = String(u);
+  if (/^https?:\/\//i.test(s)) return s;
+  return `${siteOrigin}${s.startsWith("/") ? s : `/${s}`}`;
+}
+const heroAbs = toAbsolute(heroUrl);
 
 // Safely derive year
 let year: string | null = null;
@@ -68,7 +97,7 @@ if (date) {
   if (!isNaN(d.getTime())) year = String(d.getFullYear());
 }
 
-// JSON-LD for this project (injected into Base via structuredData)
+// JSON-LD for this project
 const projectSchema = {
   "@context": "https://schema.org",
   "@type": "CreativeWork",
@@ -101,21 +130,21 @@ const reviewSchema = testimonial?.quote
     }
   : null;
 
-// Breadcrumbs for this page (consumed by Base to build BreadcrumbList)
+// Breadcrumbs
 const crumbs: Array<{ name: string; url?: string }> = [
   { name: "Home", url: `${siteOrigin}/` },
   { name: "Projects", url: `${siteOrigin}/#projects` },
   { name: title, url: projectUrl },
 ];
 
-// Build structuredData array
+// Structured data array
 const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSchema];
 ---
 
 <Base
   title={title}
   description={summary ?? "Project case study"}
-  image={hero ?? "/images/og-default.jpg"}
+  image={heroUrl ?? "/images/og-default.jpg"}
   breadcrumbs={crumbs}
   structuredData={structuredData}
 >
@@ -141,18 +170,24 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
       box-shadow: var(--shadow);
     }
 
-    /* Minimal testimonial polish; feel free to move/expand in global.css */
+    /* Avatar styles must target both <img.avatar> and <picture><img> cases */
+    .testimonial .avatar,
+    .testimonial .avatar img {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      display: block;
+    }
+    .testimonial .avatar{
+      border-radius:50%;
+    }
     .testimonial {
       display: grid;
       grid-template-columns: 64px 1fr;
       gap: 14px;
       align-items: start;
-    }
-    .testimonial .avatar {
-      width: 64px; height: 64px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid var(--line);
     }
     .testimonial blockquote {
       margin: 0;
@@ -197,9 +232,10 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
         ) : null}
       </div>
 
-      {hero ? (
+      {heroUrl ? (
         <figure class="hero-img">
-          <img src={hero} alt={title + " hero image"} loading="eager" />
+          {/* Add width/height if you know them for perfect CLS */}
+          <Img src={heroUrl} alt={title + " hero image"} loading="eager" class="w-full" />
         </figure>
       ) : null}
     </section>
@@ -216,8 +252,16 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
           <article class="card">
             <h2>Client Comments</h2>
             <div class="testimonial">
-              {testimonial.photo ? (
-                <img class="avatar" src={testimonial.photo} alt={(testimonial.name ?? "Client") + " — photo"} />
+              {testimonialPhotoUrl ? (
+                <Img
+                  class="avatar"
+                  src={testimonialPhotoUrl}
+                  alt={(testimonial.name ?? "Client") + " — photo"}
+                  width={64}
+                  height={64}
+                  loading="lazy"
+                  decoding="async"
+                />
               ) : (
                 <div class="avatar" style="display:flex;align-items:center;justify-content:center;background:#f2f2f2;">👤</div>
               )}
@@ -239,11 +283,11 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
           </article>
         ) : null}
 
-        {isDesign && hero ? (
+        {isDesign && heroUrl ? (
           <article class="card">
             <h2>Full Flyer</h2>
             <div class="flyer-viewport" aria-label="Letter-size flyer preview">
-              <img src={hero} alt={title + " — full flyer"} loading="lazy" />
+              <Img src={heroUrl} alt={title + " — full flyer"} loading="lazy" class="w-full" />
             </div>
           </article>
         ) : null}

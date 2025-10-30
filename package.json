@@ -10,12 +10,13 @@
     "capture": "node capture.js"
   },
   "dependencies": {
-    "@astrojs/mdx": "^4.3.7",
-    "@tailwindcss/vite": "^4.1.15",
     "astro": "^5.14.7",
     "puppeteer": "^24.26.0",
-    "sharp": "^0.34.4",
-    "tailwindcss": "^4.1.15"
+    "sharp": "^0.34.4"
+  },
+  "devDependencies": {
+    "@astrojs/mdx": "^4.3.9",
+    "@tailwindcss/vite": "^4.1.16",
+    "tailwindcss": "^4.1.16"
   }
-
 }
