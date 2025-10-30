@@ -12,28 +12,23 @@ import { Image } from "astro:assets";
  * - quality, fit, position: transform options
  * - class, style, loading, decoding: standard attrs
  */
+
+
 const {
-  src,
-  alt = "",
-  // Fixed-size (CLS-safe)
-  width,
-  height,
-  // Responsive (srcset)
-  widths,
-  sizes = "(max-width: 768px) 100vw, 1200px",
-
-  // Perf & attrs
-  loading = "lazy",
-  decoding = "async",
-  class: className = "",
-  style = "",
-
-  // Transform options (valid for astro:assets)
-  format,          // "avif" | "webp" | "png" | "jpeg"
-  quality,         // number 1..100
-  fit,             // e.g. "cover" | "contain" | "fill" | "inside" | "outside"
-  position,        // e.g. "center", "top", "left 10px top 10px", etc.
+  src, alt = '',
+  widths = [600, 900, 1200, 1600],
+  sizes = '100vw',
+  format = ['webp'],
+  quality = 68,           // keep default modest
+  loading = 'lazy',
+  decoding = 'async',
+  fetchpriority,          // <— add this
+  class: className,
+  style,
+  width, height, fit, position
 } = Astro.props;
+
+
 
 const isStringSrc = typeof src === "string";
 ---

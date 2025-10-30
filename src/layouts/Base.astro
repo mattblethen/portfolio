@@ -2,14 +2,13 @@
 import "../styles/global.css";
 
 /**
- * Props you can pass from any page:
- *
+ * Props:
  * title?: string
  * description?: string
- * image?: string            // absolute or /relative path; used for OG/Twitter
- * noindex?: boolean         // set true to add noindex on pages you want excluded
+ * image?: string
+ * noindex?: boolean
  * breadcrumbs?: Array<{ name: string; url?: string }>
- * structuredData?: any[]    // extra JSON-LD blocks to inject (e.g., per-project CreativeWork)
+ * structuredData?: any[]
  */
 const {
   title = "Matt — Full-Stack Shopify & Web Developer",
@@ -20,28 +19,26 @@ const {
   structuredData = [],
 } = Astro.props;
 
-// Site + canonical helpers
 const siteOrigin = Astro.site ? (Astro.site as URL).origin : "https://mattblethen.com";
 const canonical = siteOrigin + Astro.url.pathname;
 
 // Normalize OG image to absolute
-const ogImage = (typeof image === "string" && image.startsWith("http")) ? image : (siteOrigin + image);
+const ogImage =
+  typeof image === "string" && image.startsWith("http") ? image : siteOrigin + image;
 
 // Default breadcrumbs: Home > Current Page
-const crumbList =
-  breadcrumbs.length
-    ? breadcrumbs
-    : [
-        { name: "Home", url: siteOrigin + "/" },
-        { name: title, url: canonical },
-      ];
+const crumbList = breadcrumbs.length
+  ? breadcrumbs
+  : [
+      { name: "Home", url: siteOrigin + "/" },
+      { name: title, url: canonical },
+    ];
 
-// Build BreadcrumbList JSON-LD
+// BreadcrumbList JSON-LD
 const breadcrumbJsonLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: crumbList.map((c: { name: string; url?: string }, i: number) => ({
-
     "@type": "ListItem",
     position: i + 1,
     name: c.name,
@@ -49,7 +46,7 @@ const breadcrumbJsonLd = {
   })),
 };
 
-// Site-level WebSite JSON-LD (+ SearchAction target your search route if/when present)
+// Site-level WebSite JSON-LD
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -62,7 +59,7 @@ const websiteJsonLd = {
   },
 };
 
-// Business JSON-LD: nationwide remote + Central KY local relevance
+// Business JSON-LD
 const professionalServiceJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
@@ -93,7 +90,6 @@ const professionalServiceJsonLd = {
   sameAs: [],
 };
 
-// Allow page-level schema injection (e.g., CreativeWork on project pages)
 const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd, ...structuredData];
 ---
 <!doctype html>
@@ -103,7 +99,11 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
     <title>{title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    {noindex ? <meta name="robots" content="noindex, follow" /> : <meta name="robots" content="index, follow" />}
+    {noindex ? (
+      <meta name="robots" content="noindex, follow" />
+    ) : (
+      <meta name="robots" content="index, follow" />
+    )}
     <link rel="canonical" href={canonical} />
 
     <!-- Social / Open Graph -->
@@ -124,33 +124,30 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
 
-    <!-- Icons (adjust paths if you keep favicons elsewhere) -->
+    <!-- Icons -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts: using system stack (Inter removed to avoid render-blocking) -->
+    {/*
+      If you decide to self-host Inter later:
+      - preload woff2 weights you use with rel="preload" as="font" crossorigin
+      - use font-display: swap
+    */}
 
-    <!-- Default JSON-LD (site / business / breadcrumbs) + page-level injections -->
+    <!-- JSON-LD (site / business / breadcrumbs) + per-page injections -->
     {jsonLdBlocks.map((obj) => (
       <script type="application/ld+json" set:html={JSON.stringify(obj)}></script>
     ))}
 
-    <!-- Allow pages to push extra tags into <head> -->
+    <!-- Page-level <head> slot -->
     <slot name="head" />
 
     <style>
-      /* Prevent any horizontal scroll issues */
       html, body { overflow-x: hidden; }
 
-      /* Header */
       header.site-header {
         position: sticky; top: 0;
         background: rgba(255,255,255,0.9);
@@ -169,12 +166,7 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
       }
       .brand { font-weight: 800; letter-spacing: .2px; white-space: nowrap; }
 
-      /* Primary nav */
-      .primary-nav {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-      }
+      .primary-nav { display: flex; align-items: center; gap: 14px; }
       .menu-toggle {
         display: none;
         background: transparent;
@@ -194,12 +186,11 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
       }
       .nav-list a { color: var(--text); text-decoration: none; }
 
-      /* Mobile menu */
       @media (max-width: 860px) {
         .menu-toggle { display: inline-flex; }
         .nav-list {
           position: fixed;
-          top: 64px; /* below header */
+          top: 64px;
           left: 0; right: 0;
           display: none;
           flex-direction: column;
@@ -214,24 +205,16 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
         .nav-list a { display: block; padding: 14px 20px; }
       }
 
-      /* Footer */
-      footer.site-footer {
-        border-top: 1px solid var(--line);
-        width: 100%;
-      }
+      footer.site-footer { border-top: 1px solid var(--line); width: 100%; }
       .site-footer .wrap {
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 16px;
         min-height: 72px;
-        flex-wrap: wrap; /* allow wrapping so it never overflows */
-      }
-      .foot-links {
-        display: flex;
-        gap: 16px;
         flex-wrap: wrap;
       }
+      .foot-links { display: flex; gap: 16px; flex-wrap: wrap; }
       @media (max-width: 720px) {
         .site-footer .wrap {
           flex-direction: column;
@@ -243,7 +226,7 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
     </style>
   </head>
   <body>
-    <!-- Shared Header / Nav -->
+    <!-- Header / Nav -->
     <header class="site-header">
       <div class="wrap">
         <a class="brand" href="/">Matt Blethen</a>
@@ -255,7 +238,6 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
             aria-expanded="false"
             aria-controls="primary-menu"
           >
-            <!-- Hamburger / Close icon (CSS swaps via [aria-expanded]) -->
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -276,7 +258,7 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
     <!-- Page content -->
     <slot />
 
-    <!-- Shared Footer -->
+    <!-- Footer -->
     <footer class="site-footer">
       <div class="wrap">
         <p>© {new Date().getFullYear()} Matt Blethen</p>
@@ -287,7 +269,7 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
     </footer>
 
     <script is:inline>
-      // Simple, accessible mobile nav toggle
+      // Accessible mobile nav toggle
       (function () {
         const btn = document.querySelector('.menu-toggle');
         const list = document.getElementById('primary-menu');
@@ -304,13 +286,9 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
         btn.addEventListener('click', () => {
           const open = list.classList.toggle('open');
           btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-          if (open) {
-            // Close when clicking outside
-            setTimeout(() => document.addEventListener('click', closeOnOutsideClick), 0);
-          }
+          if (open) setTimeout(() => document.addEventListener('click', closeOnOutsideClick), 0);
         });
 
-        // Close on Esc
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape' && list.classList.contains('open')) {
             list.classList.remove('open');

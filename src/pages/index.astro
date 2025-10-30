@@ -292,14 +292,18 @@ const faq = {
       <div class="hero-img hero-img--clean">
         <figure class="profile-wrap" aria-label="Profile photo">
           <Img
-            class="profile-photo"
+  class="profile-photo"
   src={profilePath}
   alt="Profile photo of Matt Blethen"
-  width={1500}
-  height={2000}
+  widths={[256, 320, 375, 480, 600]}
+  sizes="(max-width: 1024px) 45vw, 380px"
+  format={['webp']}
+  quality={62}
   loading="eager"
+  fetchpriority="high"
   decoding="async"
-          />
+/>
+
         </figure>
       </div>
     </section>
@@ -341,14 +345,17 @@ const faq = {
           <article class="card">
             <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
               <Img
-                src={c.img}
-                alt={c.title + " preview"}
-                widths={[600, 900, 1200, 1600]}
-                sizes="(max-width: 900px) 100vw, 1200px"
-                loading="lazy"
-                decoding="async"
-                style="display:block"
-              />
+  src={c.img}
+  alt={c.title + " preview"}
+  widths={[600, 900, 1200]}
+  sizes="(max-width: 900px) 100vw, 900px"
+  format={['webp']}
+  quality={60}
+  loading="lazy"
+  decoding="async"
+  style="display:block"
+/>
+
             </a>
             <div class="body">
               <p class="kicker">{c.kicker}</p>
@@ -378,14 +385,17 @@ const faq = {
             <article class="card compact" style="--card-scale:0.94">
               <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
                 <Img
-                  src={c.img}
-                  alt={c.title + " design preview"}
-                  widths={[600, 900, 1200, 1600]}
-                  sizes="(max-width: 900px) 100vw, 1200px"
-                  loading="lazy"
-                  decoding="async"
-                  style="display:block"
-                />
+  src={c.img}
+  alt={c.title + " preview"}
+  widths={[600, 900, 1200]}
+  sizes="(max-width: 900px) 100vw, 900px"
+  format={['webp']}
+  quality={60}
+  loading="lazy"
+  decoding="async"
+  style="display:block"
+/>
+
               </a>
               <div class="body">
                 <p class="kicker">Design</p>
