@@ -1,10 +1,9 @@
 ---
 // src/components/Img.astro
-// Minimal, build-safe passthrough <img>. No Sharp, no transforms.
-// Accepts only string/number props, so TS won’t coerce booleans like `width` -> true.
+// Safe passthrough <img> that accepts either a string URL or an imported asset object.
 
 interface Props {
-  src: string;
+  src: string | { src: string } | undefined | null;
   alt?: string;
   width?: string | number;
   height?: string | number;
@@ -16,31 +15,33 @@ interface Props {
   style?: string;
 }
 
-const {
-  src,
-  alt = '',
-  width,
-  height,
-  sizes,
-  loading,
-  decoding,
-  fetchpriority,
-  class: className,
-  style,
-} = Astro.props satisfies Props;
+const props = Astro.props as Props;
 
-// Don’t mutate or “resolve” the URL — just pass it through.
-// (Your pages already feed either /images/*, /_astro/*, data: URIs, or absolute https://)
+// Normalize src: allow string or asset object with { src }
+let srcUrl: string | undefined;
+if (typeof props.src === 'string') {
+  srcUrl = props.src;
+} else if (props.src && typeof props.src === 'object' && 'src' in props.src) {
+  srcUrl = (props.src as { src: string }).src;
+}
+
+// Bail if no usable src
+if (!srcUrl) {
+  // Render nothing to avoid broken <img>
+}
 ---
-<img
-  src={src}
-  alt={alt}
-  {...(width    ? { width } : {})}
-  {...(height   ? { height } : {})}
-  {...(sizes    ? { sizes } : {})}
-  {...(loading  ? { loading } : {})}
-  {...(decoding ? { decoding } : {})}
-  {...(fetchpriority ? { fetchpriority } : {})}
-  {...(className ? { class: className } : {})}
-  {...(style ? { style } : {})}
-/>
+
+{srcUrl ? (
+  <img
+    src={srcUrl}
+    alt={props.alt ?? ''}
+    {...(props.width ? { width: props.width } : {})}
+    {...(props.height ? { height: props.height } : {})}
+    {...(props.sizes ? { sizes: props.sizes } : {})}
+    {...(props.loading ? { loading: props.loading } : {})}
+    {...(props.decoding ? { decoding: props.decoding } : {})}
+    {...(props.fetchpriority ? { fetchpriority: props.fetchpriority } : {})}
+    {...(props.class ? { class: props.class } : {})}
+    {...(props.style ? { style: props.style } : {})}
+  />
+) : null}
