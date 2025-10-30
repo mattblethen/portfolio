@@ -48,19 +48,39 @@ const {
   } | null;
 };
 
-// Resolve assets whether they live in /public/images or /src/assets/images
+// Map all assets under /src/assets/images/** (from this file's relative path)
 const assetUrls = import.meta.glob("../../assets/images/**/*", {
   eager: true,
   import: "default",
 }) as Record<string, string>;
 
+/** Prefer a .webp version (sibling) if it exists in /src/assets/images,
+ *  otherwise fall back to the exact original in assets, then public /images/**.
+ *  - Accepts "/images/..." (legacy public path)
+ *  - Accepts absolute http(s) URLs
+ *  - Accepts any other string and returns as-is
+ */
 function resolveAssetUrl(input?: string): string | undefined {
   if (!input) return undefined;
-  if (/^https?:\/\//i.test(input)) return input; // absolute
+  if (/^https?:\/\//i.test(input)) return input; // absolute URL
+
   if (input.startsWith("/images/")) {
-    const key = "../../assets" + input; // -> ../../assets/images/...
-    return assetUrls[key] ?? input;     // fall back to public path
+    // assets key that would mirror the public path
+    // "/images/..." -> "../../assets/images/..."
+    const assetsKey = ".." + input.replace("/images", "/assets/images");
+
+    // Try .webp sibling first
+    const webpKey = assetsKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, ".webp");
+    if (assetUrls[webpKey]) return assetUrls[webpKey];
+
+    // Then exact original in assets (png/jpg/etc.)
+    if (assetUrls[assetsKey]) return assetUrls[assetsKey];
+
+    // Finally, fall back to the public path
+    return input;
   }
+
+  // Non-legacy paths: return as-is
   return input;
 }
 
@@ -150,17 +170,17 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
 >
   <style>
     /* Layout-only tweaks (keep your visual theme in global.css as you prefer) */
-    .project-grid {
+    .project-grid {{
       display: grid;
       grid-template-columns: minmax(0, 1fr) 340px;
       gap: 28px;
-    }
-    @media (max-width: 960px) {
-      .project-grid { grid-template-columns: 1fr; }
-      .project-grid aside { order: 2; }
-    }
+    }}
+    @media (max-width: 960px) {{
+      .project-grid {{ grid-template-columns: 1fr; }}
+      .project-grid aside {{ order: 2; }}
+    }}
 
-    .project-hero .hero-img img {
+    .project-hero .hero-img img {{
       border-radius: var(--radius);
       object-fit: cover;
       width: 100%;
@@ -168,39 +188,39 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
       display: block;
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
-    }
+    }}
 
     /* Avatar styles must target both <img.avatar> and <picture><img> cases */
     .testimonial .avatar,
-    .testimonial .avatar img {
+    .testimonial .avatar img {{
       width: 64px;
       height: 64px;
       border-radius: 50%;
       object-fit: cover;
       border: 1px solid var(--line);
       display: block;
-    }
-    .testimonial {
+    }}
+    .testimonial {{
       display: grid;
       grid-template-columns: 64px 1fr;
       gap: 14px;
       align-items: start;
-    }
-    .testimonial blockquote {
+    }}
+    .testimonial blockquote {{
       margin: 0;
       font-size: 1.02rem;
       line-height: 1.55;
-    }
-    .testimonial footer {
+    }}
+    .testimonial footer {{
       margin-top: 8px;
       color: var(--muted, #555);
       font-size: .95rem;
-    }
-    .stars {
+    }}
+    .stars {{
       display: inline-flex; gap: 2px; margin-left: 8px; font-size: .95rem;
-    }
-    .stars .on { opacity: 1; }
-    .stars .off { opacity: .25; }
+    }}
+    .stars .on {{ opacity: 1; }}
+    .stars .off {{ opacity: .25; }}
   </style>
 
   <div class="wrap project">

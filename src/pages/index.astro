@@ -16,21 +16,41 @@ entries.sort((a, b) => {
 });
 
 // Map all files under /src/assets/images/** so we can resolve legacy "/images/**" strings
+// Map all assets under /src/assets/images/** (built URLs)
 const assetUrls = import.meta.glob("../assets/images/**/*", {
   eager: true,
   import: "default",
 }) as Record<string, string>;
 
+/** Prefer a .webp version if it exists in /src/assets/images,
+ *  otherwise fall back to the original path (string or public).
+ *  - Accepts `"/images/.../file.png"` (legacy public path)
+ *  - Accepts `"/images/.../file.jpg"`
+ *  - Accepts any other path and returns as-is
+ */
 function resolveAssetUrl(input?: string): string | undefined {
   if (!input) return undefined;
-  if (/^https?:\/\//i.test(input)) return input; // absolute URL
+  if (/^https?:\/\//i.test(input)) return input; // absolute URL stays
+
+  // Handle legacy public path: "/images/..." → "../assets/images/..."
   if (input.startsWith("/images/")) {
-    // Try to find corresponding asset in src/assets/images/**
-    const key = ".." + input.replace("/images", "/assets/images"); // "../assets/images/..."
-    return assetUrls[key] ?? input; // fallback to public path if not found
+    const assetsKey = ".." + input.replace("/images", "/assets/images"); // "../assets/images/...ext"
+
+    // Try a .webp sibling first
+    const webpKey = assetsKey.replace(/\.(png|jpg|jpeg|gif)$/i, ".webp");
+    if (assetUrls[webpKey]) return assetUrls[webpKey];
+
+    // Then try the exact original file in assets (png/jpg/etc.)
+    if (assetUrls[assetsKey]) return assetUrls[assetsKey];
+
+    // Finally, fall back to the original public path
+    return input;
   }
+
+  // Non-legacy paths: return as-is
   return input;
 }
+
 
 // Fallback preview image (data URI)
 const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent(
