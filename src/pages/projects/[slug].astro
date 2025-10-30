@@ -28,67 +28,63 @@ const {
   links = {},
   metrics = [],
   testimonial = null,
-} = entry.data as {
-  title: string;
-  summary?: string;
-  hero?: string;  // legacy public path ok
-  client?: string;
-  date?: string | Date;
-  tags?: string[];
-  services?: string[];
-  tech?: string[];
-  links?: { live?: string };
-  metrics?: string[];
-  testimonial?: {
-    name?: string;
-    title?: string;
-    photo?: string;
-    quote?: string;
-    rating?: number;
-  } | null;
-};
+} = entry.data as any;
 
-// Map all assets under /src/assets/images/** (from this file's relative path)
+// Map all assets under /src/assets/images/**
 const assetUrls = import.meta.glob("../../assets/images/**/*", {
   eager: true,
   import: "default",
 }) as Record<string, string>;
 
-/** Prefer a .webp version (sibling) if it exists in /src/assets/images,
- *  otherwise fall back to the exact original in assets, then public /images/**.
- *  - Accepts "/images/..." (legacy public path)
- *  - Accepts absolute http(s) URLs
- *  - Accepts any other string and returns as-is
+/** Try best candidate in this order (for /images/** inputs):
+ *   1) sibling "-1200.webp"
+ *   2) same name ".webp"
+ *   3) original in /src/assets/images/**
+ *   4) fallback to public /images/**
  */
 function resolveAssetUrl(input?: string): string | undefined {
   if (!input) return undefined;
-  if (/^https?:\/\//i.test(input)) return input; // absolute URL
+  if (/^https?:\/\//i.test(input)) return input;
 
+  // Legacy public path
   if (input.startsWith("/images/")) {
-    // assets key that would mirror the public path
-    // "/images/..." -> "../../assets/images/..."
-    const assetsKey = ".." + input.replace("/images", "/assets/images");
+    const assetsKey = ".." + input.replace("/images", "/assets/images"); // "../../assets/images/..."
+    const withWebp = assetsKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, ".webp");
+    const with1200 = assetsKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, "-1200.webp");
 
-    // Try .webp sibling first
-    const webpKey = assetsKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, ".webp");
-    if (assetUrls[webpKey]) return assetUrls[webpKey];
-
-    // Then exact original in assets (png/jpg/etc.)
+    if (assetUrls[with1200]) return assetUrls[with1200];
+    if (assetUrls[withWebp]) return assetUrls[withWebp];
     if (assetUrls[assetsKey]) return assetUrls[assetsKey];
-
-    // Finally, fall back to the public path
-    return input;
+    return input; // public fallback
   }
 
-  // Non-legacy paths: return as-is
+  // Already an assets-backed path or other; return as-is
   return input;
 }
 
-const heroUrl = resolveAssetUrl(hero);
+/** Extract "-{w}x{h}" from filenames like "...-2880x3874.webp" */
+function extractDimsFromFilename(u?: string): { w: number; h: number } | null {
+  if (!u) return null;
+  const m = u.match(/-(\d{2,5})x(\d{2,5})\.[a-z0-9]+$/i);
+  if (!m) return null;
+  const w = parseInt(m[1], 10);
+  const h = parseInt(m[2], 10);
+  if (Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0) return { w, h };
+  return null;
+}
+
+// Resolve hero + testimonial photo
+const heroUrlRaw = resolveAssetUrl(hero);
 const testimonialPhotoUrl = resolveAssetUrl(testimonial?.photo);
 
+// If the path contains "-WxH", use it to set width/height; otherwise, use a sane portrait default.
+const heroDims =
+  extractDimsFromFilename(heroUrlRaw) ??
+  // portrait-ish default keeps CLS stable if dims are unknown
+  { w: 900, h: 1400 };
+
 // Detect design-style projects (print/graphic)
-const t = tags.map((x) => x.toLowerCase());
+const t = tags.map((x: string) => x.toLowerCase());
 const isDesign = t.includes("design") || t.includes("graphic") || t.includes("print");
 
 // Eyebrow text
@@ -101,14 +97,12 @@ const siteOrigin = Astro.site ? (Astro.site as URL).origin : "https://mattblethe
 const projectUrl = `${siteOrigin}/projects/${entry.slug}/`;
 
 // Ensure absolute image URL for structured data
-function toAbsolute(u: unknown) {
+function toAbsolute(u?: string) {
   if (!u) return undefined;
-  if (typeof u === "object" && u !== null && "src" in (u as any)) u = (u as any).src;
-  const s = String(u);
-  if (/^https?:\/\//i.test(s)) return s;
-  return `${siteOrigin}${s.startsWith("/") ? s : `/${s}`}`;
+  if (/^https?:\/\//i.test(u)) return u;
+  return `${siteOrigin}${u.startsWith("/") ? u : `/${u}`}`;
 }
-const heroAbs = toAbsolute(heroUrl);
+const heroAbs = toAbsolute(heroUrlRaw);
 
 // Safely derive year
 let year: string | null = null;
@@ -150,26 +144,23 @@ const reviewSchema = testimonial?.quote
     }
   : null;
 
-// Breadcrumbs
+// Breadcrumbs + structured data
 const crumbs: Array<{ name: string; url?: string }> = [
   { name: "Home", url: `${siteOrigin}/` },
   { name: "Projects", url: `${siteOrigin}/#projects` },
   { name: title, url: projectUrl },
 ];
-
-// Structured data array
 const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSchema];
 ---
 
 <Base
   title={title}
   description={summary ?? "Project case study"}
-  image={heroUrl ?? "/images/og-default.jpg"}
+  image={heroUrlRaw ?? "/images/og-default.jpg"}
   breadcrumbs={crumbs}
   structuredData={structuredData}
 >
   <style>
-    /* Layout-only tweaks (keep your visual theme in global.css as you prefer) */
     .project-grid {{
       display: grid;
       grid-template-columns: minmax(0, 1fr) 340px;
@@ -190,11 +181,9 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
       box-shadow: var(--shadow);
     }}
 
-    /* Avatar styles must target both <img.avatar> and <picture><img> cases */
     .testimonial .avatar,
     .testimonial .avatar img {{
-      width: 64px;
-      height: 64px;
+      width: 64px; height: 64px;
       border-radius: 50%;
       object-fit: cover;
       border: 1px solid var(--line);
@@ -206,19 +195,9 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
       gap: 14px;
       align-items: start;
     }}
-    .testimonial blockquote {{
-      margin: 0;
-      font-size: 1.02rem;
-      line-height: 1.55;
-    }}
-    .testimonial footer {{
-      margin-top: 8px;
-      color: var(--muted, #555);
-      font-size: .95rem;
-    }}
-    .stars {{
-      display: inline-flex; gap: 2px; margin-left: 8px; font-size: .95rem;
-    }}
+    .testimonial blockquote {{ margin: 0; font-size: 1.02rem; line-height: 1.55; }}
+    .testimonial footer {{ margin-top: 8px; color: var(--muted, #555); font-size: .95rem; }}
+    .stars {{ display: inline-flex; gap: 2px; margin-left: 8px; font-size: .95rem; }}
     .stars .on {{ opacity: 1; }}
     .stars .off {{ opacity: .25; }}
   </style>
@@ -249,17 +228,26 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
         ) : null}
       </div>
 
-      {heroUrl ? (
+      {heroUrlRaw ? (
         <figure class="hero-img">
-          {/* Add width/height if you know them for perfect CLS */}
-          <Img src={heroUrl} alt={title + " hero image"} loading="eager" class="w-full" />
+          {/* LCP: eager + high priority + explicit dims + sizes */}
+          <Img
+            src={heroUrlRaw}
+            alt={title + " hero image"}
+            width={heroDims.w}
+            height={heroDims.h}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            class="w-full"
+          />
         </figure>
       ) : null}
     </section>
 
     <!-- TWO-COLUMN GRID -->
     <section class="project-grid" aria-label="Project content">
-      <!-- LEFT COLUMN: MDX body + Client Comments + (optional) Flyer -->
+      <!-- LEFT COLUMN -->
       <div>
         <article class="card">
           <Content />
@@ -300,11 +288,19 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
           </article>
         ) : null}
 
-        {isDesign && heroUrl ? (
+        {isDesign && heroUrlRaw ? (
           <article class="card">
             <h2>Full Flyer</h2>
             <div class="flyer-viewport" aria-label="Letter-size flyer preview">
-              <Img src={heroUrl} alt={title + " — full flyer"} loading="lazy" class="w-full" />
+              <Img
+                src={heroUrlRaw}
+                alt={title + " — full flyer"}
+                width={heroDims.w}
+                height={heroDims.h}
+                loading="lazy"
+                decoding="async"
+                class="w-full"
+              />
             </div>
           </article>
         ) : null}
@@ -316,7 +312,7 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
           <div class="card">
             <h2>Services</h2>
             <ul class="list">
-              {services.map((s) => <li>{s}</li>)}
+              {services.map((s: string) => <li>{s}</li>)}
             </ul>
           </div>
         ) : null}
@@ -325,7 +321,7 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
           <div class="card">
             <h2>Tech</h2>
             <ul class="list">
-              {tech.map((x) => <li>{x}</li>)}
+              {tech.map((x: string) => <li>{x}</li>)}
             </ul>
           </div>
         ) : null}
@@ -334,7 +330,7 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
           <div class="card">
             <h2>Tags</h2>
             <div class="meta" style="padding:10px">
-              {tags.map((tag) => <span class="chip">{tag}</span>)}
+              {tags.map((tag: string) => <span class="chip">{tag}</span>)}
             </div>
           </div>
         ) : null}
@@ -343,14 +339,14 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
           <div class="card">
             <h2>Outcomes</h2>
             <ul class="list outcomes-list">
-              {metrics.map((m) => <li>{m}</li>)}
+              {metrics.map((m: string) => <li>{m}</li>)}
             </ul>
           </div>
         ) : null}
       </aside>
     </section>
 
-    <!-- Modal for gallery (global CSS supplies styles) -->
+    <!-- Modal for gallery -->
     <div id="gallery-modal" class="gallery-modal" hidden aria-hidden="true" role="dialog" aria-label="Image preview">
       <button class="close" aria-label="Close preview">&times;</button>
       <img id="gallery-modal-img" alt="" />
@@ -363,7 +359,6 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
     </div>
   </div>
 
-  <!-- Inline, page-safe script for gallery modal -->
   <script is:inline>
     (function () {
       var gallery = document.querySelector('.case-gallery-castle');
@@ -398,9 +393,7 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
       });
 
       closeBtn.addEventListener('click', closeModal);
-      modal.addEventListener('click', function (e) {
-        if (e.target === modal) closeModal();
-      });
+      modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') closeModal();
       });
