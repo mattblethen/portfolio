@@ -2,19 +2,16 @@
   "name": "my-portfolio",
   "type": "module",
   "version": "0.0.1",
-  "private": true,
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check",
     "astro": "astro",
-    "vercel-build": "astro build --verbose",
     "capture": "node capture.js"
   },
   "dependencies": {
-    "astro": "^5.15.3",
     "@astrojs/check": "^0.9.5",
+    "astro": "^5.14.7",
     "puppeteer": "^24.26.0",
     "sharp": "^0.34.4",
     "typescript": "^5.9.3"
@@ -23,8 +20,5 @@
     "@astrojs/mdx": "^4.3.9",
     "@tailwindcss/vite": "^4.1.16",
     "tailwindcss": "^4.1.16"
-  },
-  "engines": {
-    "node": ">=18.14.0"
   }
 }
