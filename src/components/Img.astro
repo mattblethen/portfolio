@@ -1,81 +1,46 @@
 ---
-import { Image } from "astro:assets";
+// src/components/Img.astro
+// Minimal, build-safe passthrough <img>. No Sharp, no transforms.
+// Accepts only string/number props, so TS won’t coerce booleans like `width` -> true.
 
-/**
- * Props:
- * - src: static import (recommended) OR string path from /public
- * - alt: string
- * - width, height: numbers for fixed-size image (CLS-safe)
- * - widths: number[] for responsive srcset (alternative to width/height)
- * - sizes: responsive sizes string
- * - format: "avif" | "webp" | "png" | "jpeg" (optional)
- * - quality, fit, position: transform options
- * - class, style, loading, decoding: standard attrs
- */
-
+interface Props {
+  src: string;
+  alt?: string;
+  width?: string | number;
+  height?: string | number;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  decoding?: 'auto' | 'sync' | 'async';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  class?: string;
+  style?: string;
+}
 
 const {
-  src, alt = '',
-  widths = [600, 900, 1200, 1600],
-  sizes = '100vw',
-  format = ['webp'],
-  quality = 68,           // keep default modest
-  loading = 'lazy',
-  decoding = 'async',
-  fetchpriority,          // <— add this
+  src,
+  alt = '',
+  width,
+  height,
+  sizes,
+  loading,
+  decoding,
+  fetchpriority,
   class: className,
   style,
-  width, height, fit, position
-} = Astro.props;
+} = Astro.props satisfies Props;
 
-
-
-const isStringSrc = typeof src === "string";
+// Don’t mutate or “resolve” the URL — just pass it through.
+// (Your pages already feed either /images/*, /_astro/*, data: URIs, or absolute https://)
 ---
-
-{isStringSrc ? (
-  /* For /public paths or external URLs (no build-time optimization) */
-  <img
-    src={src}
-    alt={alt}
-    width={width}
-    height={height}
-    class={className}
-    loading={loading}
-    decoding={decoding}
-    style={style}
-  />
-) : widths ? (
-  /* Responsive, optimized output with srcset */
-  <Image
-    src={src}
-    alt={alt}
-    widths={widths}
-    sizes={sizes}
-    loading={loading}
-    decoding={decoding}
-    format={format}
-    quality={quality}
-    fit={fit}
-    position={position}
-    class={className}
-    style={style}
-  />
-) : (
-  /* Fixed-size, optimized output (CLS-safe) */
-  <Image
-    src={src}
-    alt={alt}
-    width={width}
-    height={height}
-    sizes={sizes}
-    loading={loading}
-    decoding={decoding}
-    format={format}
-    quality={quality}
-    fit={fit}
-    position={position}
-    class={className}
-    style={style}
-  />
-)}
+<img
+  src={src}
+  alt={alt}
+  {...(width    ? { width } : {})}
+  {...(height   ? { height } : {})}
+  {...(sizes    ? { sizes } : {})}
+  {...(loading  ? { loading } : {})}
+  {...(decoding ? { decoding } : {})}
+  {...(fetchpriority ? { fetchpriority } : {})}
+  {...(className ? { class: className } : {})}
+  {...(style ? { style } : {})}
+/>
