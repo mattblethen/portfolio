@@ -337,7 +337,7 @@ a:hover { opacity: .9; }
 }
 .card li{
   list-style:disc;
-  margin-left:1rem;
+  margin-left:2rem;
 }
 .case-gallery-castle .tile img {
   max-height:200px;
