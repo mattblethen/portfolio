@@ -345,3 +345,15 @@ a:hover { opacity: .9; }
 .hero{
   margin-bottom:2rem;
 }
+.warning-bar{
+  background-color: #b9283e;
+    color: #fff;
+    
+    padding: 2rem;
+    border-radius: 1rem;
+}
+.warning-bar a{
+  color:#fff;
+  text-decoration:underline;
+}
+body{font-size:20px;}

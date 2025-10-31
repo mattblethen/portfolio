@@ -15,8 +15,7 @@ entries.sort((a, b) => {
   return db - da;
 });
 
-// Map all files under /src/assets/images/** so we can resolve legacy "/images/**" strings
-// Map all assets under /src/assets/images/** (built URLs)
+// Map all assets under /src/assets/images/** so we can resolve legacy "/images/**" strings
 const assetUrls = import.meta.glob("../assets/images/**/*", {
   eager: true,
   import: "default",
@@ -24,9 +23,6 @@ const assetUrls = import.meta.glob("../assets/images/**/*", {
 
 /** Prefer a .webp version if it exists in /src/assets/images,
  *  otherwise fall back to the original path (string or public).
- *  - Accepts `"/images/.../file.png"` (legacy public path)
- *  - Accepts `"/images/.../file.jpg"`
- *  - Accepts any other path and returns as-is
  */
 function resolveAssetUrl(input?: string): string | undefined {
   if (!input) return undefined;
@@ -50,7 +46,6 @@ function resolveAssetUrl(input?: string): string | undefined {
   // Non-legacy paths: return as-is
   return input;
 }
-
 
 // Fallback preview image (data URI)
 const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent(
@@ -83,6 +78,15 @@ const toCard = ({ slug, data }: CollectionEntry<"projects">) => {
   };
 };
 
+/** Helper: is this entry marked as an “Available Site”? */
+function isAvailable(entry: CollectionEntry<"projects">) {
+  const d: any = entry.data;
+  const t = ((d.tags ?? []) as string[]).map((x) => (x || "").toLowerCase());
+  const status = d.status?.toString?.().toLowerCase?.();
+  const flag = Boolean(d.available);
+  return status === "available" || flag === true || t.includes("available");
+}
+
 // Selected Graphic Design (tagged "design" or "graphic")
 const designCards = entries
   .filter((entry) => {
@@ -91,13 +95,17 @@ const designCards = entries
   })
   .map(toCard);
 
-// Web-first list excludes those design-only items
+// Web-first list excludes design-only items AND excludes Available Sites
 const webCards = entries
   .filter((entry) => {
     const t = ((entry.data.tags ?? []) as string[]).map((x) => x.toLowerCase());
-    return !(t.includes("design") || t.includes("graphic"));
+    const isDesignOnly = t.includes("design") || t.includes("graphic");
+    return !isDesignOnly && !isAvailable(entry);
   })
   .map(toCard);
+
+// "Available Sites" list — auto-populates from frontmatter
+const availableCards = entries.filter(isAvailable).map(toCard);
 
 // Page meta
 const page = {
@@ -355,7 +363,7 @@ const faq = {
       </p>
     </section>
 
-    <!-- Projects (Web-first) -->
+    <!-- Projects (Web-first, EXCLUDES Available Sites) -->
     <section id="projects" class="section" aria-labelledby="projects-title">
       <h2 id="projects-title">Projects</h2>
       <p class="muted">Recent work across Shopify stores and custom websites.</p>
@@ -369,7 +377,6 @@ const faq = {
                 alt={c.title + " preview"}
                 width="1200"
                 height="675"
-                sizes="(max-width: 900px) 100vw, 900px"
                 loading="lazy"
                 decoding="async"
                 style="display:block"
@@ -389,6 +396,41 @@ const faq = {
       </div>
     </section>
 
+    {/* Available Sites (auto) */}
+    {availableCards.length ? (
+      <section id="available" class="section" aria-labelledby="available-title">
+        <h2 id="available-title">Available Sites</h2>
+        <p class="muted">Ready-to-adapt Astro demos you can buy as-is or have me tailor to your brand.</p>
+
+        <div class="grid" style="margin-top:14px">
+          {availableCards.map((c) => (
+            <article class="card">
+              <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
+                <Img
+                  src={c.img}
+                  alt={c.title + " preview"}
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
+                  style="display:block"
+                />
+              </a>
+              <div class="body">
+                <p class="kicker">Available</p>
+                <h3>{c.title}</h3>
+                {c.summary ? <p class="muted">{c.summary}</p> : null}
+                <div class="tags">
+                  {c.tags.map((t: string) => <span class="tag">{t}</span>)}
+                </div>
+                <a class="view" href={c.url}>View demo →</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    ) : null}
+
     {/* Selected Graphic Design */}
     {designCards.length ? (
       <section id="design" class="section" aria-labelledby="design-title">
@@ -407,7 +449,6 @@ const faq = {
                   alt={c.title + " preview"}
                   width="1200"
                   height="675"
-                  sizes="(max-width: 900px) 100vw, 900px"
                   loading="lazy"
                   decoding="async"
                   style="display:block"

@@ -1,0 +1,244 @@
+---
+title: "Pine Ridge Beef — Astro Demo Theme"
+summary: "Lean, CLS-safe Astro site for a local beef share business: transparent pricing, mobile-first navigation, and clean forms."
+hero: "/images/projects/farm-site/home-desktop.webp"
+client: "Pine Ridge Beef (Demo)"
+date: 2025-10-31
+
+# Make it appear in the 'Available Sites' section
+status: "available"
+available: true
+
+tags:
+  - "Available"
+  - "Astro"
+  - "Tailwind"
+  - "Forms"
+  - "Performance"
+  - "Static Site"
+services:
+  - "Custom Astro theme built for clarity and speed"
+  - "Transparent pricing cards with plain-language math"
+  - "Mobile navigation overlay & sticky CTA"
+  - "Image handling with fixed dimensions (CLS-safe)"
+  - "Reserve form (no-payment demo) with clear expectations"
+tech:
+  - "Astro"
+  - "Tailwind CSS"
+  - "Vanilla JS"
+  - "MDX"
+links:
+  live: "https://farm-site-black.vercel.app"
+metrics:
+  - "CLS-safe images via fixed w/h and responsive sources"
+  - "Simple, scannable pricing boosts comprehension"
+  - "One-tap Reserve CTA improves mobile flow"
+testimonial:
+  name: "Kenzie R., Richmond KY"
+  title: "Customer"
+  photo: "/images/projects/farm-site/profile.webp"
+  quote: "Transparent pricing made it easy—and the beef is fantastic."
+  rating: 5
+---
+
+import homeFull from "@/assets/images/projects/farm-site/home-desktop.webp";
+import home1200 from "@/assets/images/projects/farm-site/home-desktop-1200.webp";
+import home768 from "@/assets/images/projects/farm-site/home-desktop-768.webp";
+
+import pricingFull from "@/assets/images/projects/farm-site/beef-shares-desktop.webp";
+import pricing1200 from "@/assets/images/projects/farm-site/beef-shares-desktop-1200.webp";
+import pricing768 from "@/assets/images/projects/farm-site/beef-shares-desktop-768.webp";
+
+import processFull from "@/assets/images/projects/farm-site/process-desktop.webp";
+import process1200 from "@/assets/images/projects/farm-site/process-desktop-1200.webp";
+import process768 from "@/assets/images/projects/farm-site/process-desktop-768.webp";
+
+import aboutFull from "@/assets/images/projects/farm-site/about-desktop.webp";
+import about1200 from "@/assets/images/projects/farm-site/about-desktop-1200.webp";
+import about768 from "@/assets/images/projects/farm-site/about-desktop-768.webp";
+
+import galleryFull from "@/assets/images/projects/farm-site/gallery-desktop.webp";
+import gallery1200 from "@/assets/images/projects/farm-site/gallery-desktop-1200.webp";
+import gallery768 from "@/assets/images/projects/farm-site/gallery-desktop-768.webp";
+
+import reserveFull from "@/assets/images/projects/farm-site/reserve-desktop.webp";
+import reserve1200 from "@/assets/images/projects/farm-site/reserve-desktop-1200.webp";
+import reserve768 from "@/assets/images/projects/farm-site/reserve-desktop-768.webp";
+
+import mobileMenuFull from "@/assets/images/projects/farm-site/mobile-menu.webp";
+import mobileMenu1200 from "@/assets/images/projects/farm-site/mobile-menu-1200.webp";
+import mobileMenu768 from "@/assets/images/projects/farm-site/mobile-menu-768.webp";
+
+import speedTestFull from "@/assets/images/projects/farm-site/pageSpeedtest.webp";
+import speedTest1200 from "@/assets/images/projects/farm-site/pageSpeedtest-1200.webp";
+import speedTest768 from "@/assets/images/projects/farm-site/pageSpeedtest-768.webp";
+
+## Overview
+
+**Pine Ridge Beef** is a polished Astro demo meant for local farms selling **¼, ½, and whole beef shares**.  
+The focus is clarity: plain-language pricing, USDA processing notes, and a CTA that stays obvious on mobile.
+
+Highlights:
+
+- **Transparent pricing cards** with estimated totals & freezer space
+- **How-it-works timeline** from reservation to pickup/delivery
+- **Gallery** that sets expectations (pasture → processor → packaged beef)
+- **Reserve form** (no payment) to capture intent with the right details
+- **CLS-safe images** using fixed dimensions and responsive sources
+
+<h2 style="margin-top:20px;">Gallery</h2>
+
+<div class="case-gallery-castle">
+
+  {/* Home (hero) */}
+  <figure class="tile">
+    <picture>
+      <source srcset={`${home768.src} 768w, ${home1200.src} 1200w, ${homeFull.src} 1600w`} type="image/webp" />
+      <img
+        src={home1200.src}
+        srcset={`${home768.src} 768w, ${home1200.src} 1200w, ${homeFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Homepage hero with pasture scene, clear value props, and primary CTAs"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={homeFull.src}
+      />
+    </picture>
+    <figcaption>Homepage — clear value props and primary CTAs</figcaption>
+  </figure>
+
+  {/* Pricing */}
+  <figure class="tile">
+    <picture>
+      <source srcset={`${pricing768.src} 768w, ${pricing1200.src} 1200w, ${pricingFull.src} 1600w`} type="image/webp" />
+      <img
+        src={pricing1200.src}
+        srcset={`${pricing768.src} 768w, ${pricing1200.src} 1200w, ${pricingFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Transparent pricing cards for quarter, half, and whole beef shares"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={pricingFull.src}
+      />
+    </picture>
+    <figcaption>Beef Shares — plain-language pricing and freezer-space guidance</figcaption>
+  </figure>
+
+  {/* Process */}
+  <figure class="tile">
+    <picture>
+      <source srcset={`${process768.src} 768w, ${process1200.src} 1200w, ${processFull.src} 1600w`} type="image/webp" />
+      <img
+        src={process1200.src}
+        srcset={`${process768.src} 768w, ${process1200.src} 1200w, ${processFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Step-by-step process from reservation to pickup/delivery"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={processFull.src}
+      />
+    </picture>
+    <figcaption>How It Works — timeline with photos and actions</figcaption>
+  </figure>
+
+  {/* About */}
+  <figure class="tile">
+    <picture>
+      <source srcset={`${about768.src} 768w, ${about1200.src} 1200w, ${aboutFull.src} 1600w`} type="image/webp" />
+      <img
+        src={about1200.src}
+        srcset={`${about768.src} 768w, ${about1200.src} 1200w, ${aboutFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="About page with family photo and approach cards"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={aboutFull.src}
+      />
+    </picture>
+    <figcaption>About — family story and husbandry approach</figcaption>
+  </figure>
+
+  {/* Gallery */}
+  <figure class="tile">
+    <picture>
+      <source srcset={`${gallery768.src} 768w, ${gallery1200.src} 1200w, ${galleryFull.src} 1600w`} type="image/webp" />
+      <img
+        src={gallery1200.src}
+        srcset={`${gallery768.src} 768w, ${gallery1200.src} 1200w, ${galleryFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Gallery with pasture, herd, processor, and packaged beef"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={galleryFull.src}
+      />
+    </picture>
+    <figcaption>Gallery — sets expectations from pasture to freezer</figcaption>
+  </figure>
+
+  {/* Reserve */}
+  <figure class="tile">
+    <picture>
+      <source srcset={`${reserve768.src} 768w, ${reserve1200.src} 1200w, ${reserveFull.src} 1600w`} type="image/webp" />
+      <img
+        src={reserve1200.src}
+        srcset={`${reserve768.src} 768w, ${reserve1200.src} 1200w, ${reserveFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Reserve form collecting share size, timing, and notes"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={reserveFull.src}
+      />
+    </picture>
+    <figcaption>Reserve — no-payment form to confirm butcher date</figcaption>
+  </figure>
+
+  {/* Mobile Menu */}
+  <figure class="tile">
+    <picture>
+      <source srcset={`${mobileMenu768.src} 768w, ${mobileMenu1200.src} 1200w, ${mobileMenuFull.src} 1440w`} type="image/webp" />
+      <img
+        src={mobileMenu1200.src}
+        srcset={`${mobileMenu768.src} 768w, ${mobileMenu1200.src} 1200w, ${mobileMenuFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Mobile menu overlay with primary Reserve CTA"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={mobileMenuFull.src}
+      />
+    </picture>
+    <figcaption>Mobile navigation — spacious overlay with sticky CTA</figcaption>
+  </figure>
+
+{/* PageSpeed Test */}
+  <figure class="tile">
+    <picture>
+      <source srcset={`${speedTest768.src} 768w, ${speedTest1200.src} 1200w, ${speedTestFull.src} 1440w`} type="image/webp" />
+      <img
+        src={speedTest1200.src}
+        srcset={`${speedTest768.src} 768w, ${speedTest1200.src} 1200w, ${speedTestFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Mobile menu overlay with primary Reserve CTA"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={speedTestFull.src}
+      />
+    </picture>
+    <figcaption>Live Google PageSpeed Test Results</figcaption>
+  </figure>
+</div>
