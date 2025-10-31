@@ -36,11 +36,21 @@ testimonial:
   rating: 5
 ---
 
-import Img from "@/components/Img.astro";
-import collection from "@/assets/images/projects/castlejewelry/collection.webp";
-import mobile from "@/assets/images/projects/castlejewelry/mobile.webp";
-import mobileux from "@/assets/images/projects/castlejewelry/mobileux.webp";
-import product from "@/assets/images/projects/castlejewelry/product.webp";
+import collectionFull from "@/assets/images/projects/castlejewelry/collection.webp";
+import collection1200 from "@/assets/images/projects/castlejewelry/collection-1200.webp";
+import collection768 from "@/assets/images/projects/castlejewelry/collection-768.webp";
+
+import mobileFull from "@/assets/images/projects/castlejewelry/mobile.webp";
+import mobile1200 from "@/assets/images/projects/castlejewelry/mobile-1200.webp";
+import mobile768 from "@/assets/images/projects/castlejewelry/mobile-768.webp";
+
+import mobileuxFull from "@/assets/images/projects/castlejewelry/mobileux.webp";
+import mobileux1200 from "@/assets/images/projects/castlejewelry/mobileux-1200.webp";
+import mobileux768 from "@/assets/images/projects/castlejewelry/mobileux-768.webp";
+
+import productFull from "@/assets/images/projects/castlejewelry/product.webp";
+import product1200 from "@/assets/images/projects/castlejewelry/product-1200.webp";
+import product768 from "@/assets/images/projects/castlejewelry/product-768.webp";
 
 ## Overview
 
@@ -48,63 +58,93 @@ The previous site relied on a stock theme that limited merchandising and slowed 
 
 <h2 style="margin-top:20px;">Gallery</h2>
 <div class="case-gallery-castle">
+
+  {/* Collection */}
   <figure class="tile">
-    <Img
-      src={collection}
-      alt="New Arrivals collection with filters and fast-loading product grid"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={collection.src}
-    />
+    <picture>
+      <source
+        srcset={`${collection768.src} 768w, ${collection1200.src} 1200w, ${collectionFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={collection1200.src}
+        srcset={`${collection768.src} 768w, ${collection1200.src} 1200w, ${collectionFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="New Arrivals collection with filters and fast-loading product grid"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={collectionFull.src}
+      />
+    </picture>
     <figcaption>Collection — Metafield-driven merchandising</figcaption>
   </figure>
 
+  {/* Homepage (mobile) */}
   <figure class="tile">
-    <Img
-      src={mobile}
-      alt="Homepage on mobile — hero, CTA, and above-the-fold content"
-      widths={[480, 768, 1024, 1440]}
-      sizes="(max-width: 768px) 100vw, 768px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[9/16]"
-      style="display:block;"
-      data-full={mobile.src}
-    />
+    <picture>
+      <source
+        srcset={`${mobile768.src} 768w, ${mobile1200.src} 1200w, ${mobileFull.src} 1440w`}
+        type="image/webp"
+      />
+      <img
+        src={mobile1200.src}
+        srcset={`${mobile768.src} 768w, ${mobile1200.src} 1200w, ${mobileFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Homepage on mobile — hero, CTA, and above-the-fold content"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={mobileFull.src}
+      />
+    </picture>
     <figcaption>Homepage (mobile)</figcaption>
   </figure>
 
+  {/* Mobile navigation */}
   <figure class="tile">
-    <Img
-      src={mobileux}
-      alt="Mobile navigation menu showcasing clear categories and utilities"
-      widths={[480, 768, 1024, 1440]}
-      sizes="(max-width: 768px) 100vw, 768px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[9/16]"
-      style="display:block;"
-      data-full={mobileux.src}
-    />
+    <picture>
+      <source
+        srcset={`${mobileux768.src} 768w, ${mobileux1200.src} 1200w, ${mobileuxFull.src} 1440w`}
+        type="image/webp"
+      />
+      <img
+        src={mobileux1200.src}
+        srcset={`${mobileux768.src} 768w, ${mobileux1200.src} 1200w, ${mobileuxFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Mobile navigation menu showcasing clear categories and utilities"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={mobileuxFull.src}
+      />
+    </picture>
     <figcaption>Mobile navigation</figcaption>
   </figure>
 
+  {/* PDP */}
   <figure class="tile">
-    <Img
-      src={product}
-      alt="Product page showing gallery, pricing, promotions, and purchase actions"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={product.src}
-    />
+    <picture>
+      <source
+        srcset={`${product768.src} 768w, ${product1200.src} 1200w, ${productFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={product1200.src}
+        srcset={`${product768.src} 768w, ${product1200.src} 1200w, ${productFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Product page showing gallery, pricing, promotions, and purchase actions"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={productFull.src}
+      />
+    </picture>
     <figcaption>Product page (PDP)</figcaption>
   </figure>
+
 </div>

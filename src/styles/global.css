@@ -332,3 +332,16 @@ a:hover { opacity: .9; }
   }
 .project .card{ grid-column: auto; }
 .project-grid aside .card + .card{ margin-top:16px; }
+.hero-img picture{
+  width:100%;
+}
+.card li{
+  list-style:disc;
+  margin-left:1rem;
+}
+.case-gallery-castle .tile img {
+  max-height:200px;
+}
+.hero{
+  margin-bottom:2rem;
+}

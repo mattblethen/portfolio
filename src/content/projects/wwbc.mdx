@@ -37,13 +37,29 @@ testimonial:
   rating: 5
 ---
 
-import Img from "@/components/Img.astro";
-import scentShowcase from "@/assets/images/projects/WWBC/02-scent-showcase-desktop.webp";
-import oilsCollection from "@/assets/images/projects/WWBC/wildwestbeardco-com-collections-beard-oils-20251024-130436.webp";
-import westernBreezeCollection from "@/assets/images/projects/WWBC/wildwestbeardco-com-collections-western-breeze-20251024-130137.webp";
-import westernBreezePdp from "@/assets/images/projects/WWBC/wildwestbeardco-com-products-western-breeze-1oz-30ml-20251024-130421.webp";
-import homeMobile from "@/assets/images/projects/WWBC/04-home-mobile.webp";
-import mobileMenu from "@/assets/images/projects/WWBC/05-mobile-menu-open.webp";
+import scentShowcaseFull from "@/assets/images/projects/WWBC/02-scent-showcase-desktop.webp";
+import scentShowcase1200 from "@/assets/images/projects/WWBC/02-scent-showcase-desktop-1200.webp";
+import scentShowcase768 from "@/assets/images/projects/WWBC/02-scent-showcase-desktop-768.webp";
+
+import oilsCollectionFull from "@/assets/images/projects/WWBC/wildwestbeardco-com-collections-beard-oils-20251024-130436.webp";
+import oilsCollection1200 from "@/assets/images/projects/WWBC/wildwestbeardco-com-collections-beard-oils-20251024-130436-1200.webp";
+import oilsCollection768 from "@/assets/images/projects/WWBC/wildwestbeardco-com-collections-beard-oils-20251024-130436-768.webp";
+
+import wbCollectionFull from "@/assets/images/projects/WWBC/wildwestbeardco-com-collections-western-breeze-20251024-130137.webp";
+import wbCollection1200 from "@/assets/images/projects/WWBC/wildwestbeardco-com-collections-western-breeze-20251024-130137-1200.webp";
+import wbCollection768 from "@/assets/images/projects/WWBC/wildwestbeardco-com-collections-western-breeze-20251024-130137-768.webp";
+
+import wbPdpFull from "@/assets/images/projects/WWBC/wildwestbeardco-com-products-western-breeze-1oz-30ml-20251024-130421.webp";
+import wbPdp1200 from "@/assets/images/projects/WWBC/wildwestbeardco-com-products-western-breeze-1oz-30ml-20251024-130421-1200.webp";
+import wbPdp768 from "@/assets/images/projects/WWBC/wildwestbeardco-com-products-western-breeze-1oz-30ml-20251024-130421-768.webp";
+
+import homeMobileFull from "@/assets/images/projects/WWBC/04-home-mobile.webp";
+import homeMobile768 from "@/assets/images/projects/WWBC/04-home-mobile-768.webp";
+import homeMobile1200 from "@/assets/images/projects/WWBC/04-home-mobile-1200.webp";
+
+import mobileMenuFull from "@/assets/images/projects/WWBC/05-mobile-menu-open.webp";
+import mobileMenu768 from "@/assets/images/projects/WWBC/05-mobile-menu-open-768.webp";
+import mobileMenu1200 from "@/assets/images/projects/WWBC/05-mobile-menu-open-1200.webp";
 
 ## Overview
 
@@ -61,94 +77,139 @@ The build emphasizes both **brand narrative** and **conversion flow**, with feat
 The result is a modern, scalable Shopify ecosystem that preserves the brand’s Western soul while dramatically improving usability, speed, and storytelling impact.
 
 <h2 style="margin-top:20px;">Gallery</h2>
+
 <div class="case-gallery-castle">
+
+  {/* Scent Showcase */}
   <figure class="tile">
-    <Img
-      src={scentShowcase}
-      alt="Scent Showcase desktop layout highlighting signature scents with immersive photography"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={scentShowcase.src}
-    />
+    <picture>
+      <source
+        srcset={`${scentShowcase768.src} 768w, ${scentShowcase1200.src} 1200w, ${scentShowcaseFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={scentShowcase1200.src}
+        srcset={`${scentShowcase768.src} 768w, ${scentShowcase1200.src} 1200w, ${scentShowcaseFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Scent Showcase desktop layout highlighting signature scents with immersive photography"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={scentShowcaseFull.src}
+      />
+    </picture>
     <figcaption>Scent Showcase — immersive storytelling for each scent family</figcaption>
   </figure>
 
+  {/* Oils Collection */}
   <figure class="tile">
-    <Img
-      src={oilsCollection}
-      alt="Beard oils collection displaying product grid and PNW-inspired branding"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={oilsCollection.src}
-    />
+    <picture>
+      <source
+        srcset={`${oilsCollection768.src} 768w, ${oilsCollection1200.src} 1200w, ${oilsCollectionFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={oilsCollection1200.src}
+        srcset={`${oilsCollection768.src} 768w, ${oilsCollection1200.src} 1200w, ${oilsCollectionFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Beard oils collection displaying product grid and PNW-inspired branding"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={oilsCollectionFull.src}
+      />
+    </picture>
     <figcaption>Collection — beard oils grid with consistent Western visual tone</figcaption>
   </figure>
 
+  {/* Western Breeze Collection Page */}
   <figure class="tile">
-    <Img
-      src={westernBreezeCollection}
-      alt="Western Breeze scent page featuring ingredient showcase and paired products"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={westernBreezeCollection.src}
-    />
+    <picture>
+      <source
+        srcset={`${wbCollection768.src} 768w, ${wbCollection1200.src} 1200w, ${wbCollectionFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={wbCollection1200.src}
+        srcset={`${wbCollection768.src} 768w, ${wbCollection1200.src} 1200w, ${wbCollectionFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Western Breeze scent page featuring ingredient showcase and paired products"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={wbCollectionFull.src}
+      />
+    </picture>
     <figcaption>Scent page — dynamic ingredient highlights and paired product logic</figcaption>
   </figure>
 
+  {/* Western Breeze PDP */}
   <figure class="tile">
-    <Img
-      src={westernBreezePdp}
-      alt="Product page for Western Breeze beard oil showing metafield-driven combo offer"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={westernBreezePdp.src}
-    />
+    <picture>
+      <source
+        srcset={`${wbPdp768.src} 768w, ${wbPdp1200.src} 1200w, ${wbPdpFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={wbPdp1200.src}
+        srcset={`${wbPdp768.src} 768w, ${wbPdp1200.src} 1200w, ${wbPdpFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Product page for Western Breeze beard oil showing metafield-driven combo offer"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={wbPdpFull.src}
+      />
+    </picture>
     <figcaption>Product page — metafield-powered combo logic and ingredient breakdown</figcaption>
   </figure>
 
+  {/* Home Mobile */}
   <figure class="tile">
-    <Img
-      src={homeMobile}
-      alt="Mobile homepage showing signature scent section and responsive layout"
-      widths={[480, 768, 1024, 1440]}
-      sizes="(max-width: 768px) 100vw, 768px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[9/16]"
-      style="display:block;"
-      data-full={homeMobile.src}
-    />
+    <picture>
+      <source
+        srcset={`${homeMobile768.src} 768w, ${homeMobile1200.src} 1200w, ${homeMobileFull.src} 1440w`}
+        type="image/webp"
+      />
+      <img
+        src={homeMobile1200.src}
+        srcset={`${homeMobile768.src} 768w, ${homeMobile1200.src} 1200w, ${homeMobileFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Mobile homepage showing signature scent section and responsive layout"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={homeMobileFull.src}
+      />
+    </picture>
     <figcaption>Homepage (mobile) — signature scents and adaptive content blocks</figcaption>
   </figure>
 
+  {/* Mobile Menu */}
   <figure class="tile">
-    <Img
-      src={mobileMenu}
-      alt="Mobile menu open view displaying navigation items and social icons"
-      widths={[480, 768, 1024, 1440]}
-      sizes="(max-width: 768px) 100vw, 768px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[9/16]"
-      style="display:block;"
-      data-full={mobileMenu.src}
-    />
+    <picture>
+      <source
+        srcset={`${mobileMenu768.src} 768w, ${mobileMenu1200.src} 1200w, ${mobileMenuFull.src} 1440w`}
+        type="image/webp"
+      />
+      <img
+        src={mobileMenu1200.src}
+        srcset={`${mobileMenu768.src} 768w, ${mobileMenu1200.src} 1200w, ${mobileMenuFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Mobile menu open view displaying navigation items and social icons"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={mobileMenuFull.src}
+      />
+    </picture>
     <figcaption>Mobile navigation — minimalist UX for fast browsing</figcaption>
   </figure>
+
 </div>

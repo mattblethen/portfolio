@@ -34,12 +34,25 @@ testimonial:
   rating: 5
 ---
 
-import Img from "@/components/Img.astro";
-import homeDesktop from "@/assets/images/projects/rkyhighlandgames/01-home-desktop.webp";
-import scheduleDesktop from "@/assets/images/projects/rkyhighlandgames/02-schedule-desktop.webp";
-import sponsorsDesktop from "@/assets/images/projects/rkyhighlandgames/04-sponsors-desktop.webp";
-import homeMobile from "@/assets/images/projects/rkyhighlandgames/08-home-mobile.webp";
-import mobileMenu from "@/assets/images/projects/rkyhighlandgames/mobile-menu.webp";
+import homeDesktopFull from "@/assets/images/projects/rkyhighlandgames/01-home-desktop.webp";
+import homeDesktop1200 from "@/assets/images/projects/rkyhighlandgames/01-home-desktop-1200.webp";
+import homeDesktop768 from "@/assets/images/projects/rkyhighlandgames/01-home-desktop-768.webp";
+
+import scheduleDesktopFull from "@/assets/images/projects/rkyhighlandgames/02-schedule-desktop.webp";
+import scheduleDesktop1200 from "@/assets/images/projects/rkyhighlandgames/02-schedule-desktop-1200.webp";
+import scheduleDesktop768 from "@/assets/images/projects/rkyhighlandgames/02-schedule-desktop-768.webp";
+
+import sponsorsDesktopFull from "@/assets/images/projects/rkyhighlandgames/04-sponsors-desktop.webp";
+import sponsorsDesktop1200 from "@/assets/images/projects/rkyhighlandgames/04-sponsors-desktop-1200.webp";
+import sponsorsDesktop768 from "@/assets/images/projects/rkyhighlandgames/04-sponsors-desktop-768.webp";
+
+import homeMobileFull from "@/assets/images/projects/rkyhighlandgames/08-home-mobile.webp";
+import homeMobile1200 from "@/assets/images/projects/rkyhighlandgames/08-home-mobile-1200.webp";
+import homeMobile768 from "@/assets/images/projects/rkyhighlandgames/08-home-mobile-768.webp";
+
+import mobileMenuFull from "@/assets/images/projects/rkyhighlandgames/mobile-menu.webp";
+import mobileMenu1200 from "@/assets/images/projects/rkyhighlandgames/mobile-menu-1200.webp";
+import mobileMenu768 from "@/assets/images/projects/rkyhighlandgames/mobile-menu-768.webp";
 
 ## Overview
 
@@ -48,78 +61,115 @@ A minimalist component set (hero CTA, schedule block, sponsor tiers, and form se
 
 <h2 style="margin-top:20px;">Gallery</h2>
 <div class="case-gallery-castle">
+
+  {/* Homepage (desktop) */}
   <figure class="tile">
-    <Img
-      src={homeDesktop}
-      alt="Homepage hero with plaid-styled CTA for event sign-ups"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={homeDesktop.src}
-    />
+    <picture>
+      <source
+        srcset={`${homeDesktop768.src} 768w, ${homeDesktop1200.src} 1200w, ${homeDesktopFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={homeDesktop1200.src}
+        srcset={`${homeDesktop768.src} 768w, ${homeDesktop1200.src} 1200w, ${homeDesktopFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Homepage hero with plaid-styled CTA for event sign-ups"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={homeDesktopFull.src}
+      />
+    </picture>
     <figcaption>Homepage — Hero & primary CTA</figcaption>
   </figure>
 
+  {/* Schedule / Events */}
   <figure class="tile">
-    <Img
-      src={scheduleDesktop}
-      alt="Events page with simple registration form fields"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={scheduleDesktop.src}
-    />
+    <picture>
+      <source
+        srcset={`${scheduleDesktop768.src} 768w, ${scheduleDesktop1200.src} 1200w, ${scheduleDesktopFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={scheduleDesktop1200.src}
+        srcset={`${scheduleDesktop768.src} 768w, ${scheduleDesktop1200.src} 1200w, ${scheduleDesktopFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Events page with simple registration form fields"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={scheduleDesktopFull.src}
+      />
+    </picture>
     <figcaption>Events — Registration form</figcaption>
   </figure>
 
+  {/* Sponsors */}
   <figure class="tile">
-    <Img
-      src={sponsorsDesktop}
-      alt="Sponsor tiers displayed as scannable cards on a plaid background"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={sponsorsDesktop.src}
-    />
+    <picture>
+      <source
+        srcset={`${sponsorsDesktop768.src} 768w, ${sponsorsDesktop1200.src} 1200w, ${sponsorsDesktopFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={sponsorsDesktop1200.src}
+        srcset={`${sponsorsDesktop768.src} 768w, ${sponsorsDesktop1200.src} 1200w, ${sponsorsDesktopFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Sponsor tiers displayed as scannable cards on a plaid background"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={sponsorsDesktopFull.src}
+      />
+    </picture>
     <figcaption>Sponsor tiers — Bronze / Silver / Gold</figcaption>
   </figure>
 
+  {/* Homepage (mobile) */}
   <figure class="tile">
-    <Img
-      src={homeMobile}
-      alt="Mobile homepage with large headline and plaid CTA button"
-      widths={[480, 768, 1024, 1440]}
-      sizes="(max-width: 768px) 100vw, 768px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[9/16]"
-      style="display:block;"
-      data-full={homeMobile.src}
-    />
+    <picture>
+      <source
+        srcset={`${homeMobile768.src} 768w, ${homeMobile1200.src} 1200w, ${homeMobileFull.src} 1440w`}
+        type="image/webp"
+      />
+      <img
+        src={homeMobile1200.src}
+        srcset={`${homeMobile768.src} 768w, ${homeMobile1200.src} 1200w, ${homeMobileFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Mobile homepage with large headline and plaid CTA button"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={homeMobileFull.src}
+      />
+    </picture>
     <figcaption>Homepage (mobile)</figcaption>
   </figure>
 
+  {/* Mobile menu */}
   <figure class="tile">
-    <Img
-      src={mobileMenu}
-      alt="Mobile slide-out menu with clear section links"
-      widths={[480, 768, 1024, 1440]}
-      sizes="(max-width: 768px) 100vw, 768px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[9/16]"
-      style="display:block;"
-      data-full={mobileMenu.src}
-    />
+    <picture>
+      <source
+        srcset={`${mobileMenu768.src} 768w, ${mobileMenu1200.src} 1200w, ${mobileMenuFull.src} 1440w`}
+        type="image/webp"
+      />
+      <img
+        src={mobileMenu1200.src}
+        srcset={`${mobileMenu768.src} 768w, ${mobileMenu1200.src} 1200w, ${mobileMenuFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Mobile slide-out menu with clear section links"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={mobileMenuFull.src}
+      />
+    </picture>
     <figcaption>Mobile navigation</figcaption>
   </figure>
+
 </div>

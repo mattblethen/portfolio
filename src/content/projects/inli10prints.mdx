@@ -36,12 +36,25 @@ testimonial:
   rating: 5
 ---
 
-import Img from "@/components/Img.astro";
-import homeDesktop from "@/assets/images/projects/inli10prints/01-home-desktop.webp";
-import newArrivals from "@/assets/images/projects/inli10prints/02-new-arrivals-desktop.webp";
-import aboutDesktop from "@/assets/images/projects/inli10prints/04-about-desktop.webp";
-import mobileMenu from "@/assets/images/projects/inli10prints/04-mobile-menu.webp";
-import homeMobile from "@/assets/images/projects/inli10prints/05-home-mobile.webp";
+import homeDesktopFull from "@/assets/images/projects/inli10prints/01-home-desktop.webp";
+import homeDesktop1200 from "@/assets/images/projects/inli10prints/01-home-desktop-1200.webp";
+import homeDesktop768 from "@/assets/images/projects/inli10prints/01-home-desktop-768.webp";
+
+import newArrivalsFull from "@/assets/images/projects/inli10prints/02-new-arrivals-desktop.webp";
+import newArrivals1200 from "@/assets/images/projects/inli10prints/02-new-arrivals-desktop-1200.webp";
+import newArrivals768 from "@/assets/images/projects/inli10prints/02-new-arrivals-desktop-768.webp";
+
+import aboutDesktopFull from "@/assets/images/projects/inli10prints/04-about-desktop.webp";
+import aboutDesktop1200 from "@/assets/images/projects/inli10prints/04-about-desktop-1200.webp";
+import aboutDesktop768 from "@/assets/images/projects/inli10prints/04-about-desktop-768.webp";
+
+import mobileMenuFull from "@/assets/images/projects/inli10prints/04-mobile-menu.webp";
+import mobileMenu1200 from "@/assets/images/projects/inli10prints/04-mobile-menu-1200.webp";
+import mobileMenu768 from "@/assets/images/projects/inli10prints/04-mobile-menu-768.webp";
+
+import homeMobileFull from "@/assets/images/projects/inli10prints/05-home-mobile.webp";
+import homeMobile1200 from "@/assets/images/projects/inli10prints/05-home-mobile-1200.webp";
+import homeMobile768 from "@/assets/images/projects/inli10prints/05-home-mobile-768.webp";
 
 ## Overview
 
@@ -53,78 +66,115 @@ The result is a stunning, cohesive experience that brings the artwork to life ac
 
 <h2 style="margin-top:20px;">Gallery</h2>
 <div class="case-gallery-castle">
+
+  {/* Home (desktop) */}
   <figure class="tile">
-    <Img
-      src={homeDesktop}
-      alt="Homepage showcasing hero lifestyle imagery and featured product grid"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={homeDesktop.src}
-    />
+    <picture>
+      <source
+        srcset={`${homeDesktop768.src} 768w, ${homeDesktop1200.src} 1200w, ${homeDesktopFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={homeDesktop1200.src}
+        srcset={`${homeDesktop768.src} 768w, ${homeDesktop1200.src} 1200w, ${homeDesktopFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Homepage showcasing hero lifestyle imagery and featured product grid"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={homeDesktopFull.src}
+      />
+    </picture>
     <figcaption>Homepage — Hero layout and featured products</figcaption>
   </figure>
 
+  {/* New Arrivals */}
   <figure class="tile">
-    <Img
-      src={newArrivals}
-      alt="New Arrivals collection displaying rugs, tapestries, and blankets with color harmony"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={newArrivals.src}
-    />
+    <picture>
+      <source
+        srcset={`${newArrivals768.src} 768w, ${newArrivals1200.src} 1200w, ${newArrivalsFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={newArrivals1200.src}
+        srcset={`${newArrivals768.src} 768w, ${newArrivals1200.src} 1200w, ${newArrivalsFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="New Arrivals collection displaying rugs, tapestries, and blankets with color harmony"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={newArrivalsFull.src}
+      />
+    </picture>
     <figcaption>Collection — New Arrivals with cohesive design presentation</figcaption>
   </figure>
 
+  {/* About (desktop) */}
   <figure class="tile">
-    <Img
-      src={aboutDesktop}
-      alt="About page featuring brand story and artistic mural imagery"
-      widths={[600, 900, 1200, 1600]}
-      sizes="(max-width: 900px) 100vw, 1200px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[16/9]"
-      style="display:block;"
-      data-full={aboutDesktop.src}
-    />
+    <picture>
+      <source
+        srcset={`${aboutDesktop768.src} 768w, ${aboutDesktop1200.src} 1200w, ${aboutDesktopFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={aboutDesktop1200.src}
+        srcset={`${aboutDesktop768.src} 768w, ${aboutDesktop1200.src} 1200w, ${aboutDesktopFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="About page featuring brand story and artistic mural imagery"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={aboutDesktopFull.src}
+      />
+    </picture>
     <figcaption>About — Brand narrative and visual philosophy</figcaption>
   </figure>
 
+  {/* Mobile menu (portrait) */}
   <figure class="tile">
-    <Img
-      src={mobileMenu}
-      alt="Mobile navigation menu displaying product categories and social icons"
-      widths={[480, 768, 1024, 1440]}
-      sizes="(max-width: 768px) 100vw, 768px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[9/16]"
-      style="display:block;"
-      data-full={mobileMenu.src}
-    />
+    <picture>
+      <source
+        srcset={`${mobileMenu768.src} 768w, ${mobileMenu1200.src} 1200w, ${mobileMenuFull.src} 1440w`}
+        type="image/webp"
+      />
+      <img
+        src={mobileMenu1200.src}
+        srcset={`${mobileMenu768.src} 768w, ${mobileMenu1200.src} 1200w, ${mobileMenuFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Mobile navigation menu displaying product categories and social icons"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={mobileMenuFull.src}
+      />
+    </picture>
     <figcaption>Mobile navigation menu</figcaption>
   </figure>
 
+  {/* Home (mobile) */}
   <figure class="tile">
-    <Img
-      src={homeMobile}
-      alt="Mobile homepage showing hero banner and responsive product grid"
-      widths={[480, 768, 1024, 1440]}
-      sizes="(max-width: 768px) 100vw, 768px"
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover aspect-[9/16]"
-      style="display:block;"
-      data-full={homeMobile.src}
-    />
+    <picture>
+      <source
+        srcset={`${homeMobile768.src} 768w, ${homeMobile1200.src} 1200w, ${homeMobileFull.src} 1440w`}
+        type="image/webp"
+      />
+      <img
+        src={homeMobile1200.src}
+        srcset={`${homeMobile768.src} 768w, ${homeMobile1200.src} 1200w, ${homeMobileFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Mobile homepage showing hero banner and responsive product grid"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={homeMobileFull.src}
+      />
+    </picture>
     <figcaption>Homepage (mobile)</figcaption>
   </figure>
+
 </div>

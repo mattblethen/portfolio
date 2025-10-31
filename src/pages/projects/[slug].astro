@@ -30,36 +30,37 @@ const {
   testimonial = null,
 } = entry.data as any;
 
-// Map all assets under /src/assets/images/**
+/** Map all assets under /src/assets/images/** so we can resolve legacy `/images/**` */
 const assetUrls = import.meta.glob("../../assets/images/**/*", {
   eager: true,
   import: "default",
 }) as Record<string, string>;
 
-/** Try best candidate in this order (for /images/** inputs):
- *   1) sibling "-1200.webp"
- *   2) same name ".webp"
- *   3) original in /src/assets/images/**
- *   4) fallback to public /images/**
+/** Resolve an image URL from frontmatter:
+ *  - If absolute (http/https) => return as-is
+ *  - If starts with /images/ => try to find compiled asset in /src/assets/images/**
+ *      prefer .webp and -1200.webp if present
+ *  - Else return unchanged
  */
 function resolveAssetUrl(input?: string): string | undefined {
   if (!input) return undefined;
   if (/^https?:\/\//i.test(input)) return input;
 
-  // Legacy public path
   if (input.startsWith("/images/")) {
-    const assetsKey = ".." + input.replace("/images", "/assets/images"); // "../../assets/images/..."
-    const withWebp = assetsKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, ".webp");
-    const with1200 = assetsKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, "-1200.webp");
-
+    const baseKey = ".." + input.replace("/images", "/assets/images"); // "../../assets/images/.."
+    const withWebp = baseKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, ".webp");
+    const with1200 = baseKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, "-1200.webp");
     if (assetUrls[with1200]) return assetUrls[with1200];
     if (assetUrls[withWebp]) return assetUrls[withWebp];
-    if (assetUrls[assetsKey]) return assetUrls[assetsKey];
-    return input; // public fallback
+    if (assetUrls[baseKey]) return assetUrls[baseKey];
+    return input; // fallback to public path
   }
-
-  // Already an assets-backed path or other; return as-is
   return input;
+}
+
+/** Add suffix before extension, force .webp output for our variants */
+function withSuffix(u: string, suffix: string) {
+  return u.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, `${suffix}.webp`);
 }
 
 /** Extract "-{w}x{h}" from filenames like "...-2880x3874.webp" */
@@ -73,18 +74,21 @@ function extractDimsFromFilename(u?: string): { w: number; h: number } | null {
   return null;
 }
 
-// Resolve hero + testimonial photo
+// Resolve hero + testimonial photo (raw/base URL)
 const heroUrlRaw = resolveAssetUrl(hero);
 const testimonialPhotoUrl = resolveAssetUrl(testimonial?.photo);
 
-// If the path contains "-WxH", use it to set width/height; otherwise, use a sane portrait default.
+// Prefer explicit dimensions from filename; otherwise a safe default to prevent CLS
 const heroDims =
   extractDimsFromFilename(heroUrlRaw) ??
-  // portrait-ish default keeps CLS stable if dims are unknown
-  { w: 900, h: 1400 };
+  { w: 1200, h: 675 }; // sensible 16:9 default if unknown
+
+// Build responsive variants (browsers will skip if a file isn't found)
+const heroMobile = heroUrlRaw ? withSuffix(heroUrlRaw, "-768") : undefined;
+const heroLarge  = heroUrlRaw ? withSuffix(heroUrlRaw, "-1200") : undefined;
 
 // Detect design-style projects (print/graphic)
-const t = tags.map((x: string) => x.toLowerCase());
+const t = (tags as string[]).map((x) => (x || "").toLowerCase());
 const isDesign = t.includes("design") || t.includes("graphic") || t.includes("print");
 
 // Eyebrow text
@@ -96,7 +100,6 @@ const eyebrow = isDesign
 const siteOrigin = Astro.site ? (Astro.site as URL).origin : "https://mattblethen.com";
 const projectUrl = `${siteOrigin}/projects/${entry.slug}/`;
 
-// Ensure absolute image URL for structured data
 function toAbsolute(u?: string) {
   if (!u) return undefined;
   if (/^https?:\/\//i.test(u)) return u;
@@ -160,6 +163,18 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
   breadcrumbs={crumbs}
   structuredData={structuredData}
 >
+  {/* Preload LCP hero with responsive candidates */}
+  <Fragment slot="head">
+    {heroUrlRaw ? (
+      <link
+        rel="preload"
+        as="image"
+        imagesrcset={`${heroMobile ?? ""} 768w, ${heroLarge ?? heroUrlRaw} 1200w`}
+        imagesizes="(max-width: 640px) 100vw, (max-width: 1200px) 100vw, 1200px"
+      />
+    ) : null}
+  </Fragment>
+
   <style>
     .project-grid {{
       display: grid;
@@ -230,17 +245,31 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
 
       {heroUrlRaw ? (
         <figure class="hero-img">
-          {/* LCP: eager + high priority + explicit dims + sizes */}
-          <Img
-            src={heroUrlRaw}
-            alt={title + " hero image"}
-            width={heroDims.w}
-            height={heroDims.h}
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-            class="w-full"
-          />
+          {/* Responsive hero for LCP: small on phones, larger on wider screens */}
+          <picture>
+            {/* Phones */}
+            <source
+              srcset={heroMobile}
+              type="image/webp"
+              media="(max-width: 640px)" />
+
+            {/* Tablets / small desktops */}
+            <source
+              srcset={heroLarge}
+              type="image/webp"
+              media="(max-width: 1200px)" />
+
+            {/* Fallback (keeps explicit dimensions for CLS=0) */}
+            <img
+              src={heroLarge ?? heroUrlRaw}
+              alt={title + " hero image"}
+              width={heroDims.w}
+              height={heroDims.h}
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              class="w-full" />
+          </picture>
         </figure>
       ) : null}
     </section>
@@ -292,15 +321,18 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
           <article class="card">
             <h2>Full Flyer</h2>
             <div class="flyer-viewport" aria-label="Letter-size flyer preview">
-              <Img
-                src={heroUrlRaw}
-                alt={title + " — full flyer"}
-                width={heroDims.w}
-                height={heroDims.h}
-                loading="lazy"
-                decoding="async"
-                class="w-full"
-              />
+              <picture>
+                <source srcset={heroLarge} type="image/webp" media="(max-width: 1200px)" />
+                <img
+                  src={heroLarge ?? heroUrlRaw}
+                  alt={title + " — full flyer"}
+                  width={heroDims.w}
+                  height={heroDims.h}
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full"
+                />
+              </picture>
             </div>
           </article>
         ) : null}
