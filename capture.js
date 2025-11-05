@@ -18,13 +18,39 @@ function ts() { const d = new Date(); const p = n => String(n).padStart(2,"0"); 
 async function preparePage(page, { mobile = false } = {}) {
   const desktopUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
   const mobileUA  = "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1";
+
   await page.setUserAgent(mobile ? mobileUA : desktopUA);
   await page.setExtraHTTPHeaders({ "Accept-Language": "en-US,en;q=0.9", "Upgrade-Insecure-Requests": "1" });
+
+  // Run BEFORE any site scripts to defeat lazy/hydration gating
   await page.evaluateOnNewDocument(() => {
+    // Mask automation
     Object.defineProperty(navigator, "webdriver", { get: () => false });
     Object.defineProperty(navigator, "plugins", { get: () => [1,2,3] });
     Object.defineProperty(navigator, "languages", { get: () => ["en-US","en"] });
+
+    // Force everything to be "intersecting" so IO-based lazy loaders mount immediately
+    const NativeIO = window.IntersectionObserver;
+    window.IntersectionObserver = class {
+      constructor(cb) { this._cb = cb; }
+      observe(el)   { try { this._cb?.([{ isIntersecting: true, intersectionRatio: 1, target: el }]); } catch {} }
+      unobserve()   {}
+      disconnect()  {}
+      takeRecords() { return []; }
+    };
+    window.IntersectionObserverEntry = NativeIO?.Entry || window.IntersectionObserverEntry || function(){};
+
+    // Don't defer on idle forever
+    window.requestIdleCallback = (fn) => setTimeout(() => fn({ timeRemaining: () => 50, didTimeout: false }), 0);
+
+    // Prefer reduced motion to skip long intro animations
+    try {
+      const style = document.createElement("style");
+      style.textContent = "@media (prefers-reduced-motion: reduce){ *{animation-duration:0.001s !important; animation-iteration-count:1 !important; transition-duration:0.001s !important;}}";
+      document.documentElement.appendChild(style);
+    } catch {}
   });
+
   await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
 }
 
@@ -90,17 +116,52 @@ async function forceEagerImages(page) {
   });
 }
 
-async function deepScrollTrigger(page, steps = 12, pause = 180) {
-  await page.evaluate(async (steps, pause) => {
+// Scroll ALL scrollable containers (not just window)
+async function autoScrollAll(page, {
+  stepPx = 800,
+  pauseMs = 160,
+  maxPasses = 8
+} = {}) {
+  await page.evaluate(async (stepPx, pauseMs, maxPasses) => {
     const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-    const step = Math.max(200, Math.round(window.innerHeight * 0.85));
-    let y = 0, H = document.documentElement.scrollHeight;
-    for (let i = 0; i < steps && y < H + 2000; i++) {
-      y += step; window.scrollTo(0, y); await sleep(pause);
-      H = document.documentElement.scrollHeight;
+
+    const scrollables = (() => {
+      const out = new Set([document.scrollingElement || document.documentElement, document.body]);
+      const all = Array.from(document.querySelectorAll("*"));
+      for (const el of all) {
+        const style = getComputedStyle(el);
+        const canScroll = /(auto|scroll)/.test(style.overflow + style.overflowY + style.overflowX);
+        if (canScroll && el.scrollHeight > el.clientHeight + 4) out.add(el);
+      }
+      return Array.from(out).filter(Boolean);
+    })();
+
+    for (let pass = 0; pass < maxPasses; pass++) {
+      let grew = false;
+
+      for (const el of scrollables) {
+        el.scrollTo(0, 0);
+        await sleep(pauseMs);
+
+        let lastMax = el.scrollHeight;
+        for (let y = 0; y < el.scrollHeight + stepPx * 2; y += stepPx) {
+          el.scrollTo(0, y);
+          window.dispatchEvent(new Event("scroll"));
+          window.dispatchEvent(new Event("resize"));
+          await sleep(pauseMs);
+
+          if (el.scrollHeight > lastMax + 10) {
+            lastMax = el.scrollHeight;
+            grew = true;
+          }
+        }
+
+        el.scrollTo(0, 0);
+      }
+
+      if (!grew) break;
     }
-    window.scrollTo(0, 0);
-  }, steps, pause);
+  }, stepPx, pauseMs, maxPasses);
 }
 
 async function waitForImagesToSettle(page, timeoutMs = 12000) {
@@ -117,18 +178,39 @@ async function waitForImagesToSettle(page, timeoutMs = 12000) {
       return imgsReady && bgReady;
     });
     if (ok) return true;
-    await sleep(200);
+    await new Promise(r => setTimeout(r, 200));
   }
   return false;
+}
+
+async function unclampRootForFullpage(page) {
+  await page.evaluate(() => {
+    const fix = (el) => {
+      if (!el) return;
+      el.style.setProperty("height", "auto", "important");
+      el.style.setProperty("min-height", "auto", "important");
+      el.style.setProperty("overflow", "visible", "important");
+    };
+    fix(document.documentElement);
+    fix(document.body);
+  });
 }
 
 async function prepAndSettle(page) {
   await hideOverlays(page);
   await sleep(250);
+
+  // First wave: convert lazy attrs -> eager
   await forceEagerImages(page);
-  await deepScrollTrigger(page);
+
+  // Thorough multi-container scroll (fires IO-based lazy loaders)
+  await autoScrollAll(page, { stepPx: 900, pauseMs: 180, maxPasses: 10 });
+
+  // Second wave: for nodes inserted during scroll
   await forceEagerImages(page);
-  await waitForImagesToSettle(page);
+
+  // Let images/backgrounds fully resolve
+  await waitForImagesToSettle(page, 18000);
 }
 
 async function openMobileMenu(page) {
@@ -193,11 +275,13 @@ async function run() {
     const page = await browser.newPage();
     await preparePage(page, { mobile: false });
     const ok = await gotoSmart(page, url);
-    if (!ok) console.error("⚠️ Could not load (desktop):", url);
-    else {
+    if (!ok) {
+      console.error("⚠️ Could not load (desktop):", url);
+    } else {
       await prepAndSettle(page);
+      await unclampRootForFullpage(page);
       const outPath = path.join(OUTDIR, `${baseSlug}-desktop.png`);
-      await page.screenshot({ path: outPath, fullPage: true });
+      await page.screenshot({ path: outPath, fullPage: true, captureBeyondViewport: true });
       console.log("✓ Saved:", outPath);
     }
     await page.close();
@@ -210,11 +294,12 @@ async function run() {
     await mobile.setViewport({ width: 390, height: 844, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
 
     const ok = await gotoSmart(mobile, url);
-    if (!ok) console.error("⚠️ Could not load (mobile):", url);
-    else {
+    if (!ok) {
+      console.error("⚠️ Could not load (mobile):", url);
+    } else {
       await prepAndSettle(mobile);
       const outPath = path.join(OUTDIR, `${baseSlug}-mobile.png`);
-      await mobile.screenshot({ path: outPath, fullPage: false });
+      await mobile.screenshot({ path: outPath, fullPage: false, captureBeyondViewport: true });
       console.log("✓ Saved:", outPath);
 
       // --- Mobile + Menu (on the SAME URL) ---
@@ -222,7 +307,7 @@ async function run() {
         await openMobileMenu(mobile);
         await sleep(400);
         const outPath2 = path.join(OUTDIR, `${baseSlug}-mobile-menu.png`);
-        await mobile.screenshot({ path: outPath2, fullPage: false });
+        await mobile.screenshot({ path: outPath2, fullPage: false, captureBeyondViewport: true });
         console.log("✓ Saved:", outPath2);
       }
     }
@@ -236,14 +321,15 @@ async function run() {
     await mobile.setViewport({ width: 390, height: 844, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
 
     const ok = await gotoSmart(mobile, url);
-    if (!ok) console.error("⚠️ Could not load (mobile menu):", url);
-    else {
-      await hideOverlays(mobile); // just hide popups; menu overlay needs to be visible
+    if (!ok) {
+      console.error("⚠️ Could not load (mobile menu):", url);
+    } else {
+      await hideOverlays(mobile); // keep menu overlay visible
       await sleep(350);
       await openMobileMenu(mobile);
       await sleep(400);
       const outPath = path.join(OUTDIR, `${baseSlug}-mobile-menu.png`);
-      await mobile.screenshot({ path: outPath, fullPage: false });
+      await mobile.screenshot({ path: outPath, fullPage: false, captureBeyondViewport: true });
       console.log("✓ Saved:", outPath);
     }
     await mobile.close();
