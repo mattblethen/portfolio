@@ -8,9 +8,9 @@ client: "Richmond Highland Games"
 services: ["Graphic Design", "Print Design", "Event Marketing"]
 tech: ["Photoshop"]
 testimonial:
-  name: "Fiona McAllister"
+  name: "Brian Tudor"
   title: "Event Coordinator, Richmond Highland Games"
-  photo: "/images/clients/rhg-fiona.jpg"
+  photo: "/images/projects/rkyhighlandgames/profile.webp"
   quote: "The flyer was a standout—clear from a distance, on-brand, and print-ready without a single revision. Attendance at our gates noticeably jumped."
   rating: 5
 ---
