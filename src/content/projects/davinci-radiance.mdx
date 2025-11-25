@@ -1,0 +1,146 @@
+---
+title: "DaVinci Radiance – Multi-Location Teeth Whitening Website (Astro)"
+summary: "A fast, modern, SEO-optimized Astro build for a Colorado-based professional teeth whitening business — complete with multi-location routing, dynamic image optimization, mobile-first UX, and conversion-focused calls-to-action."
+hero: "/images/projects/davinci/www-davinciradiance-com-20251125-104448-mobile.png"
+client: "DaVinci Radiance Teeth Whitening"
+date: 2025-11-25
+tags:
+  - "Astro"
+  - "Local SEO"
+  - "Schema"
+  - "Performance"
+  - "Multi-Location"
+  - "Responsive Design"
+services:
+  - "Full Astro site design & development"
+  - "Multi-location UX with click-to-call routing"
+  - "SEO-first architecture with LocalBusiness schema"
+  - "Image optimization using astro:assets"
+  - "Custom mobile navigation redesign"
+  - "Before/After gallery with dynamic modal system"
+tech:
+  - "Astro"
+  - "TypeScript"
+  - "Tailwind CSS"
+  - "astro:assets"
+  - "Structured Data (Schema.org)"
+  - "Vercel Deployment"
+links:
+  live: "https://davinciradiance.com"
+metrics:
+  - "Highly responsive mobile-first design driving call conversions"
+  - "Improved UX clarity for dual-location service model"
+  - "Optimized image pipelines for before/after galleries"
+  - "Fast Lighthouse scores across performance, SEO, and accessibility"
+testimonial:
+  name: "Beth (Owner)"
+  title: "Owner of DaVinci Radiance"
+  photo: ""
+  quote: ""
+  rating: 5
+---
+
+import mobileMenuFull from "@/assets/images/projects/davinci/mobilemenu.png";
+import homeMobileFull from "@/assets/images/projects/davinci/www-davinciradiance-com-20251125-104448-mobile.png";
+import aboutDesktopFull from "@/assets/images/projects/davinci/www-davinciradiance-com-about-20251125-104716-desktop.png";
+import processDesktopFull from "@/assets/images/projects/davinci/www-davinciradiance-com-process-20251125-104652-desktop.png";
+import resultsDesktopFull from "@/assets/images/projects/davinci/www-davinciradiance-com-results-20251125-104603-desktop.png";
+
+## Overview
+
+DaVinci Radiance needed a **high-trust**, **high-clarity**, and **conversion-optimized** website to help new teeth-whitening clients understand the process, view real results, and call the correct location directly from mobile.
+
+The solution was a **custom Astro build**, engineered for:
+
+- **Dual-location routing** with tap-ready CTAs  
+- **Local SEO dominance** via full `LocalBusiness` structured data for each location  
+- **Ultra-fast image optimization** using Astro’s built-in pipeline  
+- **A clean, medical-calming visual system** with soft gradients, precise spacing, and clear content hierarchy  
+- **A mobile-optimized navigation system** designed for quick decision-making  
+
+Every major page — Home, Process, Results, FAQ, About — was built with purpose: reduce friction, build trust, and prompt contact.
+
+<h2 style="margin-top:20px;">Gallery</h2>
+
+<div class="case-gallery-castle">
+
+  {/* Mobile Menu */}
+  <figure class="tile">
+    <picture>
+      <img
+        src={mobileMenuFull.src}
+        alt="DaVinci Radiance mobile menu redesign with large call buttons for each location"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={mobileMenuFull.src}
+      />
+    </picture>
+    <figcaption>Mobile navigation — redesigned with location-based CTAs</figcaption>
+  </figure>
+
+  {/* Home Mobile */}
+  <figure class="tile">
+    <picture>
+      <img
+        src={homeMobileFull.src}
+        alt="Home page mobile layout featuring hero, radiant smile imagery, and CTA buttons"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 9/16;"
+        data-full={homeMobileFull.src}
+      />
+    </picture>
+    <figcaption>Homepage (mobile) — clean, aspirational design and instant call actions</figcaption>
+  </figure>
+
+  {/* About Desktop */}
+  <figure class="tile">
+    <picture>
+      <img
+        src={aboutDesktopFull.src}
+        alt="About page desktop layout highlighting benefits and location CTAs"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={aboutDesktopFull.src}
+      />
+    </picture>
+    <figcaption>About page — trust-building info with bright lifestyle imagery</figcaption>
+  </figure>
+
+  {/* Process Desktop */}
+  <figure class="tile">
+    <picture>
+      <img
+        src={processDesktopFull.src}
+        alt="Process page explaining the 3 steps of professional whitening with visuals"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={processDesktopFull.src}
+      />
+    </picture>
+    <figcaption>Process page — three-step whitening walkthrough with real client photos</figcaption>
+  </figure>
+
+  {/* Results Desktop */}
+  <figure class="tile">
+    <picture>
+      <img
+        src={resultsDesktopFull.src}
+        alt="Results gallery showing real before/after client whitening outcomes"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style="display:block; aspect-ratio: 16/9;"
+        data-full={resultsDesktopFull.src}
+      />
+    </picture>
+    <figcaption>Results page — dynamic grid of real before/after results</figcaption>
+  </figure>
+</div>
