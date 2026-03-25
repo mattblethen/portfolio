@@ -1,0 +1,222 @@
+---
+title: "Northline Design Build - Home Builder Demo Theme"
+summary: "Warm, high-trust demo site for a custom home builder and remodeler: premium project storytelling, strong local-service framing, and flexible lead-gen sections."
+hero: "/images/projects/home-builder-remodeler/home-desktop.webp"
+client: "Northline Design Build (Demo)"
+date: 2026-03-25
+
+status: "available"
+available: true
+
+tags:
+  - "Available"
+  - "Astro"
+  - "Local SEO"
+  - "Lead Generation"
+  - "Service Business"
+services:
+  - "Custom Astro starter theme for a builder or remodeler"
+  - "Project-first homepage and case-study style gallery"
+  - "Service pages built for local trust and lead generation"
+  - "Mobile-friendly layout with premium typography and imagery"
+  - "Easy reskin path for logos, colors, copy, and project photos"
+tech:
+  - "Astro"
+  - "Tailwind CSS"
+  - "Vanilla JS"
+  - "Static Site"
+links:
+  live: "https://homebuilder-omega.vercel.app/"
+metrics:
+  - "Project-led homepage helps prospects picture the quality of work quickly"
+  - "Service and process pages support high-consideration local buying decisions"
+  - "Designed to reskin easily for custom homes, remodels, additions, or renovation firms"
+---
+
+import homeFull from "@/assets/images/projects/home-builder-remodeler/home-desktop.webp";
+import home1200 from "@/assets/images/projects/home-builder-remodeler/home-desktop-1200.webp";
+import home768 from "@/assets/images/projects/home-builder-remodeler/home-desktop-768.webp";
+
+import servicesFull from "@/assets/images/projects/home-builder-remodeler/services-desktop.webp";
+import services1200 from "@/assets/images/projects/home-builder-remodeler/services-desktop-1200.webp";
+import services768 from "@/assets/images/projects/home-builder-remodeler/services-desktop-768.webp";
+
+import projectsFull from "@/assets/images/projects/home-builder-remodeler/projects-desktop.webp";
+import projects1200 from "@/assets/images/projects/home-builder-remodeler/projects-desktop-1200.webp";
+import projects768 from "@/assets/images/projects/home-builder-remodeler/projects-desktop-768.webp";
+
+import aboutFull from "@/assets/images/projects/home-builder-remodeler/about-desktop.webp";
+import about1200 from "@/assets/images/projects/home-builder-remodeler/about-desktop-1200.webp";
+import about768 from "@/assets/images/projects/home-builder-remodeler/about-desktop-768.webp";
+
+import contactFull from "@/assets/images/projects/home-builder-remodeler/contact-desktop.webp";
+import contact1200 from "@/assets/images/projects/home-builder-remodeler/contact-desktop-1200.webp";
+import contact768 from "@/assets/images/projects/home-builder-remodeler/contact-desktop-768.webp";
+
+import homeMobileFull from "@/assets/images/projects/home-builder-remodeler/home-mobile.webp";
+import homeMobile1200 from "@/assets/images/projects/home-builder-remodeler/home-mobile-1200.webp";
+import homeMobile768 from "@/assets/images/projects/home-builder-remodeler/home-mobile-768.webp";
+
+import servicesMobileFull from "@/assets/images/projects/home-builder-remodeler/services-mobile.webp";
+import servicesMobile1200 from "@/assets/images/projects/home-builder-remodeler/services-mobile-1200.webp";
+import servicesMobile768 from "@/assets/images/projects/home-builder-remodeler/services-mobile-768.webp";
+
+import contactMobileFull from "@/assets/images/projects/home-builder-remodeler/contact-mobile.webp";
+import contactMobile1200 from "@/assets/images/projects/home-builder-remodeler/contact-mobile-1200.webp";
+import contactMobile768 from "@/assets/images/projects/home-builder-remodeler/contact-mobile-768.webp";
+
+## Overview
+
+**Northline Design Build** is a ready-to-own demo site for a custom home builder, remodeler, or design-build firm that needs to feel established from day one.
+
+The concept leans into a warmer, premium visual language: large project imagery, detail-forward copy, and a layout built around trust, process, and local-service credibility. It is meant to be easy to adapt for businesses focused on custom homes, kitchen and bath remodels, additions, or higher-end renovations.
+
+Highlights:
+
+- **Project-led homepage** that quickly shows quality and craftsmanship
+- **Service page structure** built for custom homes, remodels, additions, and renovations
+- **Process and about content** that supports higher-consideration buying decisions
+- **Contact page** with strong estimate CTA and clear local-service framing
+- **Reskin-friendly design system** that can be updated quickly with a real brand's logo, palette, photos, and copy
+
+<h2 style="margin-top:20px;">Gallery</h2>
+
+<div class="case-gallery-castle">
+
+  <figure class="tile tile-desktop">
+    <picture class="tile-media">
+      <source srcset={`${home768.src} 768w, ${home1200.src} 1200w, ${homeFull.src} 1600w`} type="image/webp" />
+      <img
+        src={home1200.src}
+        srcset={`${home768.src} 768w, ${home1200.src} 1200w, ${homeFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Homepage with premium builder hero, featured services, and project-first storytelling"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={homeFull.src}
+      />
+    </picture>
+    <figcaption>Homepage - premium first impression with strong local-service framing and featured work</figcaption>
+  </figure>
+
+  <figure class="tile tile-desktop">
+    <picture class="tile-media">
+      <source srcset={`${services768.src} 768w, ${services1200.src} 1200w, ${servicesFull.src} 1600w`} type="image/webp" />
+      <img
+        src={services1200.src}
+        srcset={`${services768.src} 768w, ${services1200.src} 1200w, ${servicesFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Services page for custom homes, remodels, additions, and whole-home renovations"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={servicesFull.src}
+      />
+    </picture>
+    <figcaption>Services - clear offer framing for custom homes, remodels, and major renovations</figcaption>
+  </figure>
+
+  <figure class="tile tile-desktop">
+    <picture class="tile-media">
+      <source srcset={`${projects768.src} 768w, ${projects1200.src} 1200w, ${projectsFull.src} 1600w`} type="image/webp" />
+      <img
+        src={projects1200.src}
+        srcset={`${projects768.src} 768w, ${projects1200.src} 1200w, ${projectsFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Projects page showing recent remodeling and custom home work in a polished grid"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={projectsFull.src}
+      />
+    </picture>
+    <figcaption>Projects - warm visual presentation that helps homeowners imagine the finished work</figcaption>
+  </figure>
+
+  <figure class="tile tile-desktop">
+    <picture class="tile-media">
+      <source srcset={`${about768.src} 768w, ${about1200.src} 1200w, ${aboutFull.src} 1600w`} type="image/webp" />
+      <img
+        src={about1200.src}
+        srcset={`${about768.src} 768w, ${about1200.src} 1200w, ${aboutFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="About page focused on process, team trust, and design-build credibility"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={aboutFull.src}
+      />
+    </picture>
+    <figcaption>About - credibility-focused storytelling around process, craftsmanship, and communication</figcaption>
+  </figure>
+
+  <figure class="tile tile-desktop">
+    <picture class="tile-media">
+      <source srcset={`${contact768.src} 768w, ${contact1200.src} 1200w, ${contactFull.src} 1600w`} type="image/webp" />
+      <img
+        src={contact1200.src}
+        srcset={`${contact768.src} 768w, ${contact1200.src} 1200w, ${contactFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Contact page with estimate request form and local service area positioning"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={contactFull.src}
+      />
+    </picture>
+    <figcaption>Contact - estimate-first layout with clear service-area messaging and a qualified lead form</figcaption>
+  </figure>
+
+  <figure class="tile tile-mobile">
+    <picture class="tile-media">
+      <source srcset={`${homeMobile768.src} 768w, ${homeMobile1200.src} 1200w, ${homeMobileFull.src} 1440w`} type="image/webp" />
+      <img
+        src={homeMobile1200.src}
+        srcset={`${homeMobile768.src} 768w, ${homeMobile1200.src} 1200w, ${homeMobileFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Homepage on mobile with strong builder hero and high-trust messaging"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={homeMobileFull.src}
+      />
+    </picture>
+    <figcaption>Homepage (mobile) - strong first impression, readable hierarchy, and immediate trust signals</figcaption>
+  </figure>
+
+  <figure class="tile tile-mobile">
+    <picture class="tile-media">
+      <source srcset={`${servicesMobile768.src} 768w, ${servicesMobile1200.src} 1200w, ${servicesMobileFull.src} 1440w`} type="image/webp" />
+      <img
+        src={servicesMobile1200.src}
+        srcset={`${servicesMobile768.src} 768w, ${servicesMobile1200.src} 1200w, ${servicesMobileFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Services page on mobile with strong headlines and clearer service descriptions"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={servicesMobileFull.src}
+      />
+    </picture>
+    <figcaption>Services (mobile) - clean readability for higher-consideration service browsing on smaller screens</figcaption>
+  </figure>
+
+  <figure class="tile tile-mobile">
+    <picture class="tile-media">
+      <source srcset={`${contactMobile768.src} 768w, ${contactMobile1200.src} 1200w, ${contactMobileFull.src} 1440w`} type="image/webp" />
+      <img
+        src={contactMobile1200.src}
+        srcset={`${contactMobile768.src} 768w, ${contactMobile1200.src} 1200w, ${contactMobileFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Contact page on mobile with estimate CTA and local service-area copy"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={contactMobileFull.src}
+      />
+    </picture>
+    <figcaption>Contact (mobile) - estimate-first CTA flow built for quick inquiry starts</figcaption>
+  </figure>
+
+</div>
