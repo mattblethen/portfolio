@@ -12,10 +12,17 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+.astro-dev.log
+.astro-dev.err.log
+.astro-dev-*.log
+.astro-dev-*.err.log
 
 # environment variables
 .env
 .env.production
+
+# local capture output
+.captures/
 
 # macOS-specific files
 .DS_Store

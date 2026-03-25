@@ -1,46 +1,65 @@
-# Astro Starter Kit: Basics
+# Matt Blethen Portfolio
 
-```sh
-npm create astro@latest -- --template basics
-```
+Astro-based portfolio and lead-generation site for Matt Blethen's Shopify, web development, and design work.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Stack
 
-## 🚀 Project Structure
+- Astro 5
+- MDX content collections
+- Tailwind CSS v4
+- TypeScript
+- Sharp for image processing
+- Puppeteer for screenshot capture
 
-Inside of your Astro project, you'll see the following folders and files:
+## Project Structure
 
 ```text
 /
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+|-- public/
+|-- scripts/
+|-- src/
+|   |-- assets/images/
+|   |-- content/projects/
+|   |-- layouts/
+|   |-- pages/
+|   `-- styles/
+|-- capture.js
+`-- package.json
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Commands
 
-## 🧞 Commands
+| Command | Action |
+| :-- | :-- |
+| `npm install` | Install dependencies |
+| `npm run dev` | Start the Astro dev server |
+| `npm run build` | Build the production site |
+| `npm run preview` | Preview the production build |
+| `npm run check` | Run Astro type/content checks |
+| `npm run capture` | Run the Puppeteer screenshot utility |
+| `npm run img:sync` | Create canonical `.webp` files and responsive `-768` / `-1200` variants from source images |
+| `npm run img:webp` | Alias for `img:sync` |
+| `npm run gen:img` | Alias for `img:sync` |
+| `npm run gen:img:clean` | Remove old generated image variants |
 
-All commands are run from the root of the project, from a terminal:
+## Content Workflow
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Project case studies live in `src/content/projects`. Each entry uses frontmatter for metadata like title, summary, hero image, services, tech, links, metrics, and testimonial data, with the long-form case study body written in MDX.
 
-## 👀 Want to learn more?
+For images, the intended workflow is:
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+1. Add one source image to `src/assets/images/...`
+2. Run `npm run img:sync`
+3. Reference the base image or generated `-768` / `-1200` variants in project content as needed
+
+You can also target a single project folder or file:
+
+- `npm run img:sync -- src/assets/images/projects/davinci`
+- `npm run img:sync -- src/assets/images/projects/davinci/hero.png`
+
+## Notes
+
+- The homepage is the main marketing landing page and includes local/national SEO content and structured data.
+- Project pages are statically generated from the `projects` content collection.
+- Astro commands may need `ASTRO_TELEMETRY_DISABLED=1` in restricted environments.
+- Screenshot captures are now written to `.captures/` so they do not ship with the production site.

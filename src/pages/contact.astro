@@ -1,14 +1,39 @@
 ---
 import Base from "../layouts/Base.astro";
+import { buildContactPageJsonLd } from "../lib/seo";
 ---
 
-<Base title="Contact — Matt Blethen" description="Get in touch about a project">
+<Base
+  title="Start a Project | Matt Blethen"
+  description="Start a Shopify or website project with Matt Blethen. Remote projects are welcome nationwide, with in-person meetings available around Richmond, Lexington, and Central Kentucky."
+  structuredData={[buildContactPageJsonLd()]}
+>
   <main class="wrap contact-page">
-    <h1>Contact Me</h1>
+    <h1>Start a Project</h1>
     <p class="muted">
-      Have a project in mind or just want to say hello? Fill out the form below or email me directly at
-      <a href="mailto:mattblethen@gmail.com">mattblethen@gmail.com</a>.
+      Tell me what you are building, what is not working, and what you want the site to do better.
+      I work remotely with clients nationwide and prefer meeting local clients around Richmond,
+      Lexington, and nearby Central Kentucky cities when it is useful.
     </p>
+
+    <div class="contact-intro">
+      <div class="contact-note">
+        <h2>Good fit projects</h2>
+        <ul>
+          <li>Shopify redesigns, theme upgrades, and conversion improvements</li>
+          <li>Service-business websites that need stronger trust and lead generation</li>
+          <li>Performance, UX, and messaging cleanups on existing sites</li>
+        </ul>
+      </div>
+      <div class="contact-note">
+        <h2>Helpful details</h2>
+        <ul>
+          <li>Current website or store URL</li>
+          <li>Main goal, timeline, and priority pages</li>
+          <li>Whether you prefer remote collaboration or a local meeting</li>
+        </ul>
+      </div>
+    </div>
 
     <form
       id="contact-form"
@@ -43,25 +68,21 @@ import Base from "../layouts/Base.astro";
       </label>
 
       <label for="message">
-        Message
+        Project details
         <textarea
           id="message"
           name="message"
-          rows="6"
+          rows="7"
           required
           autocomplete="off"
-          placeholder="Tell me a bit about your project, timeline, and goals…"
+          placeholder="Share your website or store URL, what you need help with, your timeline, and whether you prefer remote collaboration or a local meeting."
         ></textarea>
       </label>
 
-      <!-- Hidden fields -->
       <input type="hidden" name="_subject" value="New inquiry from mattblethen.com" />
-      <!-- Spam honeypot -->
       <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
 
-      <button id="submit-btn" type="submit" class="cta">Send Message</button>
-
-      <!-- Live form status -->
+      <button id="submit-btn" type="submit" class="cta">Send Project Details</button>
       <p id="form-status" class="muted" role="status" aria-live="polite" style="min-height:1.2em;"></p>
     </form>
   </main>
@@ -69,14 +90,14 @@ import Base from "../layouts/Base.astro";
   <script is:inline>
     (function () {
       const form = document.getElementById('contact-form');
-      const btn  = document.getElementById('submit-btn');
+      const btn = document.getElementById('submit-btn');
       const status = document.getElementById('form-status');
 
       if (!form || !btn || !status) return;
 
       function setBusy(isBusy, text) {
         btn.disabled = isBusy;
-        btn.textContent = isBusy ? 'Sending…' : 'Send Message';
+        btn.textContent = isBusy ? 'Sending...' : 'Send Project Details';
         status.textContent = text || '';
       }
 
@@ -90,14 +111,12 @@ import Base from "../layouts/Base.astro";
         return true;
       }
 
-      // Lightweight client-side validation UX
       form.addEventListener('input', (e) => validateField(e.target));
 
       form.addEventListener('submit', async (e) => {
-        // Native validation first
         const ok =
-          validateField(document.getElementById('name')) &
-          validateField(document.getElementById('email')) &
+          validateField(document.getElementById('name')) &&
+          validateField(document.getElementById('email')) &&
           validateField(document.getElementById('message'));
 
         if (!ok) {
@@ -106,7 +125,6 @@ import Base from "../layouts/Base.astro";
           return;
         }
 
-        // Let Formspree handle it by default; for nicer UX, do fetch submit:
         e.preventDefault();
         setBusy(true);
 
@@ -115,14 +133,14 @@ import Base from "../layouts/Base.astro";
           const resp = await fetch(form.action, {
             method: 'POST',
             body: formData,
-            headers: { 'Accept': 'application/json' }
+            headers: { Accept: 'application/json' },
           });
 
           if (resp.ok) {
             form.reset();
-            setBusy(false, 'Thanks! Your message has been sent.');
+            setBusy(false, 'Thanks. Your message has been sent.');
           } else {
-            setBusy(false, 'Hmm, something went wrong. Please try again or email me directly.');
+            setBusy(false, 'Something went wrong. Please try again or email me directly.');
           }
         } catch (err) {
           setBusy(false, 'Network error. Please try again in a moment.');
@@ -130,4 +148,31 @@ import Base from "../layouts/Base.astro";
       });
     })();
   </script>
+
+  <style>
+    .contact-intro {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 22px 0 24px;
+    }
+    .contact-note {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: var(--card);
+    }
+    .contact-note h2 {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+    }
+    .contact-note ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+    @media (max-width: 760px) {
+      .contact-intro { grid-template-columns: 1fr; }
+    }
+  </style>
 </Base>

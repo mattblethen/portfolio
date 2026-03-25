@@ -11,9 +11,10 @@
     "astro": "astro",
     "vercel-build": "astro build --verbose",
     "capture": "node capture.js",
-    "img:opt": "node scripts/optimize-images.mjs \"public/images/**/*.{png,jpg,jpeg}\" \"src/assets/images/**/*.{png,jpg,jpeg}\"",
-    "img:webp": "node scripts/convert-images.mjs",
-    "gen:img": "node scripts/gen-images.mjs",
+    "img:sync": "node scripts/sync-images.mjs",
+    "img:opt": "node scripts/sync-images.mjs",
+    "img:webp": "node scripts/sync-images.mjs",
+    "gen:img": "node scripts/sync-images.mjs",
     "gen:img:clean": "node scripts/clean-old-variants.mjs"
   },
   "dependencies": {

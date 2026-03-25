@@ -1,53 +1,63 @@
 ---
-import Base from "../layouts/Base.astro";
+import { Image } from "astro:assets";
 import { getCollection, type CollectionEntry } from "astro:content";
 import Img from "../components/Img.astro";
-import { Image } from 'astro:assets';
-import profileSrc from '../assets/images/profile.png';
+import Base from "../layouts/Base.astro";
+import profileSrc from "../assets/images/profile.png";
+import {
+  LOCAL_SERVICE_AREAS,
+  SITE_URL,
+  buildFAQJsonLd,
+  buildOfferCatalogJsonLd,
+} from "../lib/seo";
 
-// Load all projects
 const entries = await getCollection("projects");
+entries.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-// Sort by date desc
-entries.sort((a, b) => {
-  const da = new Date((a.data.date as any) || 0).getTime();
-  const db = new Date((b.data.date as any) || 0).getTime();
-  return db - da;
-});
-
-// Map all assets under /src/assets/images/** so we can resolve legacy "/images/**" strings
 const assetUrls = import.meta.glob("../assets/images/**/*", {
   eager: true,
   import: "default",
 }) as Record<string, string>;
 
-/** Prefer a .webp version if it exists in /src/assets/images,
- *  otherwise fall back to the original path (string or public).
- */
 function resolveAssetUrl(input?: string): string | undefined {
   if (!input) return undefined;
-  if (/^https?:\/\//i.test(input)) return input; // absolute URL stays
+  if (/^https?:\/\//i.test(input)) return input;
 
-  // Handle legacy public path: "/images/..." → "../assets/images/..."
   if (input.startsWith("/images/")) {
-    const assetsKey = ".." + input.replace("/images", "/assets/images"); // "../assets/images/...ext"
-
-    // Try a .webp sibling first
+    const assetsKey = ".." + input.replace("/images", "/assets/images");
     const webpKey = assetsKey.replace(/\.(png|jpg|jpeg|gif)$/i, ".webp");
     if (assetUrls[webpKey]) return assetUrls[webpKey];
-
-    // Then try the exact original file in assets (png/jpg/etc.)
     if (assetUrls[assetsKey]) return assetUrls[assetsKey];
-
-    // Finally, fall back to the original public path
-    return input;
   }
 
-  // Non-legacy paths: return as-is
   return input;
 }
 
-// Fallback preview image (data URI)
+function resolveLegacyAssetKey(input?: string) {
+  if (!input || !input.startsWith("/images/")) return undefined;
+  return ".." + input.replace("/images", "/assets/images");
+}
+
+function resolveAssetSet(input?: string) {
+  if (!input) return { src: undefined, mobile: undefined, large: undefined };
+  const fallback = resolveAssetUrl(input);
+  if (/^https?:\/\//i.test(input)) return { src: fallback, mobile: undefined, large: undefined };
+
+  const assetKey = resolveLegacyAssetKey(input);
+  if (!assetKey) return { src: fallback, mobile: undefined, large: undefined };
+
+  const original = assetUrls[assetKey];
+  const webp = assetUrls[assetKey.replace(/\.(png|jpg|jpeg|gif)$/i, ".webp")];
+  const mobile = assetUrls[assetKey.replace(/\.(png|jpg|jpeg|gif|webp)$/i, "-768.webp")];
+  const large = assetUrls[assetKey.replace(/\.(png|jpg|jpeg|gif|webp)$/i, "-1200.webp")];
+
+  return {
+    src: large ?? webp ?? original ?? fallback,
+    mobile,
+    large: large ?? webp ?? original ?? fallback,
+  };
+}
+
 const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent(
   `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'>
     <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
@@ -57,265 +67,112 @@ const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent(
     <g fill='#8aa0c8' font-family='Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif' font-size='42' font-weight='600' text-anchor='middle' dominant-baseline='middle'>
       <text x='50%' y='50%'>Project Preview</text>
     </g>
-  </svg>`
+  </svg>`,
 )}`;
 
-// Card builder
 const toCard = ({ slug, data }: CollectionEntry<"projects">) => {
   const title = data.title ?? "Untitled Project";
   const tags = ((data.tags ?? []) as string[]).slice(0, 4);
   const url = `/projects/${slug}/`;
   const hero = (data.hero as string | undefined) ?? placeholder;
+
   return {
     url,
-    img: resolveAssetUrl(hero) ?? placeholder,
+    img: resolveAssetSet(hero).large ?? resolveAssetSet(hero).src ?? placeholder,
     title,
     summary: data.summary ?? "",
     tags,
     kicker: tags.length ? tags[0] : "Case Study",
-    ariaLabel: "View project — " + title,
-    slug,
+    ariaLabel: `View project - ${title}`,
   };
 };
 
-/** Helper: is this entry marked as an “Available Site”? */
 function isAvailable(entry: CollectionEntry<"projects">) {
-  const d: any = entry.data;
-  const t = ((d.tags ?? []) as string[]).map((x) => (x || "").toLowerCase());
-  const status = d.status?.toString?.().toLowerCase?.();
-  const flag = Boolean(d.available);
-  return status === "available" || flag === true || t.includes("available");
+  const tags = (entry.data.tags ?? []).map((x) => (x || "").toLowerCase());
+  const status = entry.data.status?.toLowerCase();
+  return status === "available" || entry.data.available === true || tags.includes("available");
 }
 
-// Selected Graphic Design (tagged "design" or "graphic")
 const designCards = entries
   .filter((entry) => {
-    const t = ((entry.data.tags ?? []) as string[]).map((x) => x.toLowerCase());
-    return t.includes("design") || t.includes("graphic");
+    const tags = ((entry.data.tags ?? []) as string[]).map((x) => x.toLowerCase());
+    return tags.includes("design") || tags.includes("graphic");
   })
   .map(toCard);
 
-// Web-first list excludes design-only items AND excludes Available Sites
 const webCards = entries
   .filter((entry) => {
-    const t = ((entry.data.tags ?? []) as string[]).map((x) => x.toLowerCase());
-    const isDesignOnly = t.includes("design") || t.includes("graphic");
+    const tags = ((entry.data.tags ?? []) as string[]).map((x) => x.toLowerCase());
+    const isDesignOnly = tags.includes("design") || tags.includes("graphic");
     return !isDesignOnly && !isAvailable(entry);
   })
   .map(toCard);
 
-// "Available Sites" list — auto-populates from frontmatter
 const availableCards = entries.filter(isAvailable).map(toCard);
 
-// Page meta
 const page = {
-  title: "Shopify Developer — Nationwide Remote + Central Kentucky Local",
+  title: "Shopify Developer | Remote Nationwide, In Person Around Richmond and Lexington",
   description:
-    "U.S.-wide Shopify developer and web designer. Remote collaborations nationwide, with in-person availability for Richmond, Lexington, and Central Kentucky.",
+    "Shopify developer and web designer for ecommerce brands and service businesses nationwide, with in-person project meetings available around Richmond, Lexington, and Central Kentucky.",
 };
 
-// ---------- Local & Nationwide SEO JSON-LD ----------
-const siteUrl = "https://mattblethen.com"; // update this if needed
-const businessName = "Matt Blethen — Shopify & Web Developer";
-const kyCities = [
-  "Richmond, KY",
-  "Lexington, KY",
-  "Berea, KY",
-  "Winchester, KY",
-  "Nicholasville, KY",
-  "Georgetown, KY",
-  "Versailles, KY",
-  "Danville, KY",
-  "Lancaster, KY",
-  "Irvine, KY",
+const faqItems = [
+  {
+    question: "Do you work with clients outside Kentucky?",
+    answer:
+      "Yes. Most projects are handled remotely for businesses anywhere in the United States through clear milestones, async reviews, and scheduled calls.",
+  },
+  {
+    question: "Can we meet in person in Central Kentucky?",
+    answer:
+      "Yes. I prefer meeting local clients in Richmond, Lexington, and nearby Central Kentucky cities when that helps move the project faster.",
+  },
+  {
+    question: "Who is the best fit for your work?",
+    answer:
+      "The best fit is an ecommerce brand or service business that needs stronger design, clearer messaging, and a faster site that turns more visitors into inquiries or sales.",
+  },
+  {
+    question: "What do you usually build?",
+    answer:
+      "Most projects are Shopify theme upgrades, custom storefront builds, service-business websites, landing pages, and performance-focused redesigns.",
+  },
+  {
+    question: "Do you help after launch?",
+    answer:
+      "Yes. Ongoing support is available for site updates, conversion improvements, performance tuning, and new features after launch.",
+  },
+  {
+    question: "What does a typical project cost?",
+    answer:
+      "Smaller optimization or design projects usually start around $1,000. Full Shopify builds or larger website engagements typically fall between $3,000 and $8,000 depending on scope.",
+  },
 ];
 
-function toAbs(u?: string) {
-  if (!u) return undefined;
-  if (/^https?:\/\//i.test(u)) return u;
-  return `${siteUrl}${u.startsWith("/") ? u : `/${u}`}`;
-}
-
-const profilePath = resolveAssetUrl("/images/profile.png") ?? "/images/profile.png";
-const professionalService = {
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  name: businessName,
-  url: siteUrl,
-  image: toAbs("/images/profile.png"),
-  description:
-    "Nationwide remote Shopify development and web design, with local availability in Richmond, Lexington, and Central Kentucky.",
-  serviceArea: { "@type": "Country", name: "United States" },
-  areaServed: kyCities.map((c) => ({ "@type": "City", name: c })),
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Richmond",
-    addressRegion: "KY",
-    addressCountry: "US",
-  },
-  sameAs: [],
-};
-
-const webSite = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: businessName,
-  url: siteUrl,
-  potentialAction: {
-    "@type": "SearchAction",
-    target: `${siteUrl}/search?q={search_term_string}`,
-    "query-input": "required name=search_term_string",
-  },
-};
-
-const breadcrumb = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/` },
-    { "@type": "ListItem", position: 2, name: "Projects", item: `${siteUrl}/projects/` },
-  ],
-};
-
-const faq = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "Do you work with clients outside Kentucky?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "Yes. Most projects are handled remotely anywhere in the United States. We collaborate via Zoom, shared docs, and structured milestones.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Do you also meet locally in Central Kentucky?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "Absolutely. I’m available for in-person meetings in Richmond, Lexington, and surrounding Central KY cities when needed.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What types of businesses do you help?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "Ecommerce brands on Shopify and service businesses—contractors, real estate, medical/dental, veterinary, and trades—needing fast, clear websites that convert.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What is your process for new web projects?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "Each project begins with discovery, followed by design mockups, then development and testing. Clients receive regular updates and clear deliverables at every stage.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Do you offer maintenance or support after launch?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "Yes. Ongoing site updates, performance optimization, and feature improvements are available after launch for Shopify and custom websites.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Can you redesign my existing Shopify or WordPress site?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "Absolutely. I can modernize your current Shopify or WordPress site to improve performance, accessibility, and design consistency without losing SEO value.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What does a typical project cost?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "Most full Shopify builds range between $3,000 and $8,000, while smaller design-only or optimization projects start around $1,000 depending on complexity.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Do you handle content or photography?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "I coordinate with photographers or provide remote workflows to ensure product and lifestyle images match your brand aesthetic and platform requirements.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Can you help with SEO and marketing?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "Yes. I include technical SEO setup and can integrate Google Analytics, Search Console, and marketing automation tools for long-term growth.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Do you build custom apps or integrations for Shopify?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "I create custom Liquid sections, advanced automations, and API integrations with tools like Klaviyo and ShipStation. Full app builds are available by request.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How long does it take to complete a new Shopify store?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "Most custom Shopify stores are completed within 4 to 8 weeks, depending on scope, content readiness, and feedback turnaround time.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Do you require a contract or deposit?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "Yes. A signed project agreement and deposit secure your project slot. The remaining balance is paid in stages or upon completion.",
-      },
-    },
-  ],
-};
+const faq = buildFAQJsonLd(faqItems);
+const offerCatalog = buildOfferCatalogJsonLd(SITE_URL);
 ---
 
-<Base {...page}>
-  {/* JSON-LD */}
-  <script type="application/ld+json" set:html={JSON.stringify(professionalService)}></script>
-  <script type="application/ld+json" set:html={JSON.stringify(webSite)}></script>
-  <script type="application/ld+json" set:html={JSON.stringify(breadcrumb)}></script>
-  <script type="application/ld+json" set:html={JSON.stringify(faq)}></script>
-
+<Base {...page} structuredData={[offerCatalog, faq]}>
   <main class="wrap">
-    <!-- Hero -->
     <section class="hero hero--cleanphoto" aria-labelledby="hero-title">
       <div>
-        <div class="eyebrow">Nationwide Remote • Central KY Local</div>
+        <div class="eyebrow">Remote Nationwide | In Person Around Central Kentucky</div>
         <h1 id="hero-title" class="title">
-          Shopify stores and websites that look great and perform even better.
+          Shopify stores and service websites built to look better, load faster, and convert more visitors.
         </h1>
         <p class="lede">
-          I collaborate with clients <strong>across the United States</strong> remotely, and I’m also available
-          for <strong>in-person work in Central Kentucky</strong>—including Richmond and Lexington.
-          With a strong graphic-design background, I deliver cleaner UI, tighter brand alignment, and pixel-accurate builds.
+          I work remotely with ecommerce brands and service businesses across the United States. For clients
+          around <strong>Richmond</strong>, <strong>Lexington</strong>, and nearby Central Kentucky cities, I
+          am happy to meet in person when it helps move the project faster.
+        </p>
+        <p class="lede">
+          The focus is simple: clearer messaging, sharper design, cleaner builds, and fewer friction points
+          between a first visit and a sale or inquiry.
         </p>
         <div class="cta-row" style="display:flex; gap:12px; flex-wrap:wrap;">
-          <a class="cta" href="#projects">See Recent Web Work</a>
-          <a class="cta secondary" href="#design">See Graphic Design Work</a>
+          <a class="cta" href="/contact">Start a Project</a>
+          <a class="cta secondary" href="#projects">See Recent Work</a>
         </div>
       </div>
 
@@ -336,45 +193,44 @@ const faq = {
       </div>
     </section>
 
-    <!-- Nationwide + Local SEO Block -->
     <section class="section" aria-labelledby="coverage-title">
-      <h2 id="coverage-title">Nationwide Remote • Central Kentucky Local</h2>
+      <h2 id="coverage-title">Remote Across the U.S., Best for Local Meetings Around Richmond and Lexington</h2>
       <p class="muted">
-        I partner with ecommerce and service businesses across the U.S. via structured remote workflows—discovery,
-        design, development, and ongoing optimization. For clients near <strong>Richmond</strong> and <strong>Lexington, KY</strong>,
-        I’m available to meet on-site when it adds value.
+        Most work happens remotely through discovery calls, design reviews, milestone check-ins, and concise
+        next steps. If you are nearby, I prefer meeting local clients in person when it makes planning,
+        content gathering, or approvals easier.
       </p>
       <div class="service-areas-wrap">
-        <h3 class="h6">Common Local Meet-Up Areas (Central KY)</h3>
+        <h3 class="h6">Common Local Meeting Areas</h3>
         <ul class="service-areas" aria-label="Service areas in Central Kentucky">
-          {kyCities.map((c) => <li>{c}</li>)}
+          {LOCAL_SERVICE_AREAS.map((city) => <li>{city}</li>)}
         </ul>
       </div>
     </section>
 
-    <!-- Who I Work With -->
     <section class="section" aria-labelledby="who-title">
-      <h2 id="who-title">Who I Work With</h2>
+      <h2 id="who-title">Who I Help</h2>
       <p class="muted">
-        I partner with store owners, founders, and local service providers who need more than a template.
-        Whether you sell products online or offer services like real estate, construction, veterinary care, dental or medical,
-        I build sites that help you attract visitors and turn them into customers. Need brand assets or campaign creatives?
-        I handle those too — designed to work on the web first.
+        I usually work with two groups: ecommerce teams that need a better Shopify storefront, and service
+        businesses that need a faster, more credible website that wins more inquiries. That includes local
+        trades, medical and dental practices, real estate teams, and other businesses where trust and clarity
+        matter as much as design.
       </p>
     </section>
 
-    <!-- Projects (Web-first, EXCLUDES Available Sites) -->
     <section id="projects" class="section" aria-labelledby="projects-title">
-      <h2 id="projects-title">Projects</h2>
-      <p class="muted">Recent work across Shopify stores and custom websites.</p>
+      <h2 id="projects-title">Recent Projects</h2>
+      <p class="muted">
+        Recent Shopify and website work focused on performance, conversion clarity, and stronger brand presentation.
+      </p>
 
       <div class="grid" style="margin-top:14px">
-        {webCards.map((c) => (
+        {webCards.map((card) => (
           <article class="card">
-            <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
+            <a href={card.url} class="thumb" aria-label={card.ariaLabel}>
               <Img
-                src={c.img}
-                alt={c.title + " preview"}
+                src={card.img}
+                alt={card.title + " preview"}
                 width="1200"
                 height="675"
                 loading="lazy"
@@ -383,32 +239,33 @@ const faq = {
               />
             </a>
             <div class="body">
-              <p class="kicker">{c.kicker}</p>
-              <h3>{c.title}</h3>
-              {c.summary ? <p class="muted">{c.summary}</p> : null}
+              <p class="kicker">{card.kicker}</p>
+              <h3>{card.title}</h3>
+              {card.summary ? <p class="muted">{card.summary}</p> : null}
               <div class="tags">
-                {c.tags.map((t: string) => <span class="tag">{t}</span>)}
+                {card.tags.map((tag: string) => <span class="tag">{tag}</span>)}
               </div>
-              <a class="view" href={c.url}>View project →</a>
+              <a class="view" href={card.url}>View project -&gt;</a>
             </div>
           </article>
         ))}
       </div>
     </section>
 
-    {/* Available Sites (auto) */}
     {availableCards.length ? (
       <section id="available" class="section" aria-labelledby="available-title">
         <h2 id="available-title">Available Sites</h2>
-        <p class="muted">Ready-to-adapt Astro demos you can buy as-is or have me tailor to your brand.</p>
+        <p class="muted">
+          Ready-to-adapt Astro demos you can buy as-is or have me tailor to your business and brand.
+        </p>
 
         <div class="grid" style="margin-top:14px">
-          {availableCards.map((c) => (
+          {availableCards.map((card) => (
             <article class="card">
-              <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
+              <a href={card.url} class="thumb" aria-label={card.ariaLabel}>
                 <Img
-                  src={c.img}
-                  alt={c.title + " preview"}
+                  src={card.img}
+                  alt={card.title + " preview"}
                   width="1200"
                   height="675"
                   loading="lazy"
@@ -418,12 +275,12 @@ const faq = {
               </a>
               <div class="body">
                 <p class="kicker">Available</p>
-                <h3>{c.title}</h3>
-                {c.summary ? <p class="muted">{c.summary}</p> : null}
+                <h3>{card.title}</h3>
+                {card.summary ? <p class="muted">{card.summary}</p> : null}
                 <div class="tags">
-                  {c.tags.map((t: string) => <span class="tag">{t}</span>)}
+                  {card.tags.map((tag: string) => <span class="tag">{tag}</span>)}
                 </div>
-                <a class="view" href={c.url}>View demo →</a>
+                <a class="view" href={card.url}>View demo -&gt;</a>
               </div>
             </article>
           ))}
@@ -431,22 +288,21 @@ const faq = {
       </section>
     ) : null}
 
-    {/* Selected Graphic Design */}
     {designCards.length ? (
       <section id="design" class="section" aria-labelledby="design-title">
         <h2 id="design-title">Graphic Design</h2>
         <p class="muted">
-          Logos, brand systems, campaign art, and UI comps created with a web-first mindset. You can hire me for design-only,
-          or as part of a full website or Shopify build.
+          Logos, brand systems, campaign art, and UI comps built with web use in mind. You can hire me for
+          design-only work or pair design with development for a smoother launch.
         </p>
 
         <div class="grid design-grid" style="margin-top:10px">
-          {designCards.map((c) => (
+          {designCards.map((card) => (
             <article class="card compact" style="--card-scale:0.94">
-              <a href={c.url} class="thumb" aria-label={c.ariaLabel}>
+              <a href={card.url} class="thumb" aria-label={card.ariaLabel}>
                 <Img
-                  src={c.img}
-                  alt={c.title + " preview"}
+                  src={card.img}
+                  alt={card.title + " preview"}
                   width="1200"
                   height="675"
                   loading="lazy"
@@ -456,12 +312,12 @@ const faq = {
               </a>
               <div class="body">
                 <p class="kicker">Design</p>
-                <h3>{c.title}</h3>
-                {c.summary ? <p class="muted">{c.summary}</p> : null}
+                <h3>{card.title}</h3>
+                {card.summary ? <p class="muted">{card.summary}</p> : null}
                 <div class="tags">
-                  {c.tags.map((t: string) => <span class="tag">{t}</span>)}
+                  {card.tags.map((tag: string) => <span class="tag">{tag}</span>)}
                 </div>
-                <a class="view" href={c.url}>View case →</a>
+                <a class="view" href={card.url}>View case -&gt;</a>
               </div>
             </article>
           ))}
@@ -469,160 +325,66 @@ const faq = {
       </section>
     ) : null}
 
-    <!-- Services -->
     <section id="services" class="section" aria-labelledby="services-title">
       <h2 id="services-title">Services</h2>
       <div class="services" role="list">
         <div class="service" role="listitem">
-          <h4>Shopify Store Design & Development</h4>
-          <p>Custom themes that showcase your products, simplify management, and boost conversions.</p>
+          <h4>Shopify Design and Development</h4>
+          <p>Custom storefronts, theme rebuilds, and UX improvements that make the store easier to browse and easier to buy from.</p>
         </div>
         <div class="service" role="listitem">
-          <h4>Web-First Graphic Design & Brand Assets</h4>
-          <p>
-            Logos, brand kits, landing page/UI comps, and campaign creatives designed to translate cleanly to code.
-            Hire me for design-only, or combine with development for seamless builds.
-          </p>
+          <h4>Website Design for Service Businesses</h4>
+          <p>Clear, trust-building marketing sites for local and regional businesses that need stronger leads, not just a prettier homepage.</p>
         </div>
         <div class="service" role="listitem">
-          <h4>Speed & Optimization</h4>
-          <p>Faster load times, better search rankings, and a smoother experience on every device.</p>
+          <h4>Speed and Conversion Optimization</h4>
+          <p>Performance cleanup, Core Web Vitals improvements, and friction reduction across mobile and desktop.</p>
         </div>
         <div class="service" role="listitem">
-          <h4>Smart Integrations & Automation</h4>
-          <p>Connect email, reviews, subscriptions, inventory, and more—so your store runs smoothly.</p>
+          <h4>Design Systems and Brand Assets</h4>
+          <p>Logos, campaign graphics, and UI direction that give the website a more cohesive and more credible presentation.</p>
         </div>
         <div class="service" role="listitem">
-          <h4>WordPress & Custom Sites</h4>
-          <p>Professional sites for service businesses like realtors, contractors, vets, dentists, and clinics.</p>
+          <h4>Integrations and Workflow Support</h4>
+          <p>Email, reviews, subscriptions, fulfillment, and operational tools connected so the site supports the business behind it.</p>
         </div>
         <div class="service" role="listitem">
           <h4>Ongoing Support</h4>
-          <p>Updates, improvements, and performance tuning after launch—so you can focus on the business.</p>
+          <p>Post-launch updates, testing, and incremental improvements so the site keeps getting better instead of going stale.</p>
         </div>
       </div>
     </section>
 
-    <!-- Local + Nationwide FAQs (visible to match FAQ schema) -->
     <section class="section" aria-labelledby="faq-title">
       <h2 id="faq-title">FAQs</h2>
-      <details>
-        <summary>Do you work with clients outside Kentucky?</summary>
-        <p>Yes—I work remotely with businesses anywhere in the United States.</p>
-      </details>
-      <details>
-        <summary>Can we meet in person in Central KY?</summary>
-        <p>Yes. I’m available for on-site meetings in Richmond, Lexington, and nearby cities.</p>
-      </details>
-      <details>
-        <summary>Can you speed up or migrate my existing site?</summary>
-        <p>Absolutely—theme refactors, accessibility fixes, and migrations to Shopify or Astro.</p>
-      </details>
-      <details>
-        <summary>What is your process for new web projects?</summary>
-        <p>
-          Every project starts with discovery—clarifying goals, audiences, and design direction.
-          From there, I create a plan, design mockups, and move into development. You'll get regular
-          updates and clear deliverables at every milestone.
-        </p>
-      </details>
-      <details>
-        <summary>Do you offer maintenance or support after launch?</summary>
-        <p>
-          Yes. I provide ongoing updates, performance monitoring, and feature enhancements after launch.
-          This ensures your Shopify store or website continues to run fast and stay secure.
-        </p>
-      </details>
-      <details>
-        <summary>Can you redesign my existing Shopify or WordPress site?</summary>
-        <p>
-          Absolutely. I can rebuild your existing site on a modern framework—keeping your content and SEO value
-          while improving speed, accessibility, and conversion performance.
-        </p>
-      </details>
-      <details>
-        <summary>What does a typical project cost?</summary>
-        <p>
-          Pricing depends on scope, features, and design complexity. Most full Shopify builds range between
-          $3,000–$8,000, while smaller design-only or optimization projects start around $1,000.
-        </p>
-      </details>
-      <details>
-        <summary>Do you handle content or product photography?</summary>
-        <p>
-          I can coordinate with your photographer or recommend remote-friendly workflows for product images,
-          lifestyle shots, and content creation that match your brand’s tone and colors.
-        </p>
-      </details>
-      <details>
-        <summary>Can you help with SEO and marketing setup?</summary>
-        <p>
-          Yes. All sites are optimized for technical SEO by default, and I can integrate Google Analytics,
-          Search Console, and meta data. I also offer ongoing SEO and ad campaign support upon request.
-        </p>
-      </details>
-      <details>
-        <summary>How long does it take to complete a new Shopify store?</summary>
-        <p>
-          Most custom Shopify stores take 4–8 weeks, depending on content readiness, design complexity,
-          and feedback turnaround time.
-        </p>
-      </details>
-      <details>
-        <summary>Do you require a contract or deposit?</summary>
-        <p>
-          Yes. A signed project agreement and 30–50% deposit secure your spot in my schedule.
-          The balance is due at key milestones or on completion.
-        </p>
-      </details>
+      {faqItems.map((item) => (
+        <details>
+          <summary>{item.question}</summary>
+          <p>{item.answer}</p>
+        </details>
+      ))}
     </section>
 
-    <!-- Contact CTA -->
     <section class="cta-banner" aria-label="Contact banner">
       <p>
-        <strong>Ready to grow your online business?</strong> Let’s build something fast, flexible, and built to convert.
+        <strong>Need a sharper storefront or a website that converts more of the right people?</strong>
         <br />
-        Prefer design-only? I can deliver brand assets, UI comps, or campaign graphics that hand off cleanly to your team.
+        Remote projects are welcome nationwide. If you are around Richmond, Lexington, or nearby, I am glad to meet locally.
       </p>
-      <div class="cta-row" style="display:flex; gap:12px; flex-wrap:wrap; width:20%">
+      <div class="cta-row cta-banner__actions">
         <a class="cta" href="/contact">Start a Project</a>
       </div>
     </section>
   </main>
 
   <style>
-    .hero-img { display: grid; place-items: center; }
-    .profile-wrap {
-      position: relative;
-      width: clamp(220px, 28vw, 380px);
-      aspect-ratio: 3 / 4;
-      border-radius: 50% / 55%;
-      overflow: hidden;
-      background: linear-gradient(181deg, #ffec02 0%, #c50000 100%);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    }
-    .profile-wrap::before {
-      content: "";
-      position: absolute; inset: 0; z-index: 1;
-      background: radial-gradient(100% 100% at 50% 20%, rgba(255,255,255,0.9), rgba(0,0,0,0.05));
-    }
-    .profile-wrap img { position: relative; z-index: 2; width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
-    .profile-wrap::after {
-      content: "";
-      position: absolute; inset: 0; z-index: 3;
-      border-left: 4px solid rgba(0,0,0,0.1);
-      border-right: 4px solid rgba(0,0,0,0.1);
-      border-bottom: 4px solid rgba(0,0,0,0.1);
-      border-top: none; border-radius: inherit; pointer-events: none;
-    }
-    @media (max-width: 640px) { .profile-wrap { width: clamp(200px, 52vw, 320px); } }
-
-    .hero--cleanphoto .hero-img, .hero-img--clean { border: none; border-radius: 0; overflow: visible; box-shadow: none; background: transparent; }
-    .hero--cleanphoto .hero-img img { border-radius: 0; box-shadow: none; }
-
-    /* Local/National block */
     .service-areas-wrap { margin-top: 10px; }
-    .h6 { font-size: .95rem; letter-spacing: .02em; text-transform: uppercase; color: var(--muted, #5b6472); }
+    .h6 {
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--muted, #5b6472);
+    }
     .service-areas {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -633,8 +395,13 @@ const faq = {
     }
     .service-areas li { color: var(--muted, #5b6472); font-size: 0.95rem; }
 
-    /* Small clean FAQ */
-    details { border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 12px 14px; margin: 10px 0; background: rgba(0,0,0,0.02); }
+    details {
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 10px 0;
+      background: rgba(0,0,0,0.02);
+    }
     summary { cursor: pointer; font-weight: 600; }
     details[open] { background: rgba(0,0,0,0.04); }
   </style>

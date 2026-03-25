@@ -6,7 +6,7 @@ import readline from "readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import puppeteer from "puppeteer";
 
-const OUTDIR = path.join(process.cwd(), "public", "images", "captures");
+const OUTDIR = path.join(process.cwd(), ".captures");
 
 // ---------- helpers ----------
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -251,7 +251,7 @@ async function run() {
       else if (mode === "menu") FLAGS.add("--menu");
       else FLAGS.add("--desktop");
     }
-    await rl.close();
+    rl.close();
   } else {
     if (!/^https?:\/\//i.test(url)) url = "https://" + url;
     if (!FLAGS.size) FLAGS.add("--desktop"); // default if only URL is passed

@@ -1,9 +1,9 @@
----
+﻿---
 title: "The Castle Jewelry Custom Shopify Theme"
-summary: "Lean, metafield-driven theme with flexible sections, performance uplift, and advanced integration."
+summary: "Major Shopify theme upgrade with richer merchandising, stronger mobile UX, and Lighthouse-focused performance work."
 hero: "/images/projects/castlejewelry/hero.webp"
 client: "The Castle Jewelry"
-date: 2025-10-20
+date: 2026-03-25
 tags:
   - "Shopify"
   - "Liquid"
@@ -25,14 +25,14 @@ tech:
 links:
   live: "https://thecastlejewelry.com"
 metrics:
-  - "Increased Mobile Lighthouse site speed to boost SEO effectiveness"
-  - "~47% reduction in load time (largest pages)"
-  - "Improved conversion rate & lead generation with discount offer integrations"
+  - "Lighthouse scores: 95 Performance, 97 Accessibility, 81 Best Practices, 100 SEO"
+  - "Expanded merchandising and promotional flexibility across homepage, collections, and PDP"
+  - "Improved mobile navigation, conversion flow, and site-wide content maintainability"
 testimonial:
   name: "Barrett Block"
   title: "President, The Castle Jewelry"
   photo: "/images/projects/castlejewelry/client.jfif"
-  quote: "Matt completely revitalized our online store. The new theme not only loads lightning-fast but also makes it simple for our team to update banners, collections, and promotions on our own. It’s been a huge win for both sales and workflow."
+  quote: "Matt completely revitalized our online store. The new theme not only loads lightning-fast but also makes it simple for our team to update banners, collections, and promotions on our own. It's been a huge win for both sales and workflow."
   rating: 5
 ---
 
@@ -52,16 +52,34 @@ import productFull from "@/assets/images/projects/castlejewelry/product.webp";
 import product1200 from "@/assets/images/projects/castlejewelry/product-1200.webp";
 import product768 from "@/assets/images/projects/castlejewelry/product-768.webp";
 
+import engagementFull from "@/assets/images/projects/castlejewelry/engagement.webp";
+import engagement1200 from "@/assets/images/projects/castlejewelry/engagement-1200.webp";
+import engagement768 from "@/assets/images/projects/castlejewelry/engagement-768.webp";
+
+import braceletsFull from "@/assets/images/projects/castlejewelry/bracelets.webp";
+import bracelets1200 from "@/assets/images/projects/castlejewelry/bracelets-1200.webp";
+import bracelets768 from "@/assets/images/projects/castlejewelry/bracelets-768.webp";
+
+import engagementMobileFull from "@/assets/images/projects/castlejewelry/engagementmobile.webp";
+import engagementMobile1200 from "@/assets/images/projects/castlejewelry/engagementmobile-1200.webp";
+import engagementMobile768 from "@/assets/images/projects/castlejewelry/engagementmobile-768.webp";
+
+import productMobileFull from "@/assets/images/projects/castlejewelry/productmobile.webp";
+import productMobile1200 from "@/assets/images/projects/castlejewelry/productmobile-1200.webp";
+import productMobile768 from "@/assets/images/projects/castlejewelry/productmobile-768.webp";
+
 ## Overview
 
-The previous site relied on a stock theme that limited merchandising and slowed pages under load. I rebuilt the storefront with a custom Shopify 2.0 theme emphasizing modular sections, a metafield-driven content model, and a lean asset pipeline for speed and maintainability. The result is a faster, cleaner storefront that the in-house team can update without developer involvement.
+The latest Castle Jewelry update pushed the custom Shopify theme much further: more flexible merchandising sections, stronger promotional controls, cleaner mobile navigation, and a fresh round of performance tuning aimed squarely at Lighthouse and Core Web Vitals.
+
+The storefront now gives the team more control over featured collections, campaigns, and product storytelling without sacrificing speed. The result is a sharper shopping experience that feels more premium on the front end and more maintainable behind the scenes.
 
 <h2 style="margin-top:20px;">Gallery</h2>
 <div class="case-gallery-castle">
 
   {/* Collection */}
-  <figure class="tile">
-    <picture>
+  <figure class="tile tile-desktop">
+    <picture class="tile-media">
       <source
         srcset={`${collection768.src} 768w, ${collection1200.src} 1200w, ${collectionFull.src} 1600w`}
         type="image/webp"
@@ -70,20 +88,19 @@ The previous site relied on a stock theme that limited merchandising and slowed 
         src={collection1200.src}
         srcset={`${collection768.src} 768w, ${collection1200.src} 1200w, ${collectionFull.src} 1600w`}
         sizes="(max-width: 900px) 100vw, 1200px"
-        alt="New Arrivals collection with filters and fast-loading product grid"
+        alt="Gold Nugget Style Rings collection with filters and a cleaner product grid"
         loading="lazy"
         decoding="async"
-        class="w-full object-cover"
-        style="display:block; aspect-ratio: 16/9;"
+        class="gallery-thumb"
         data-full={collectionFull.src}
       />
     </picture>
-    <figcaption>Collection — Metafield-driven merchandising</figcaption>
+    <figcaption>Gold Nugget Style Rings collection - stronger merchandising and cleaner product scanning</figcaption>
   </figure>
 
   {/* Homepage (mobile) */}
-  <figure class="tile">
-    <picture>
+  <figure class="tile tile-mobile">
+    <picture class="tile-media">
       <source
         srcset={`${mobile768.src} 768w, ${mobile1200.src} 1200w, ${mobileFull.src} 1440w`}
         type="image/webp"
@@ -92,20 +109,19 @@ The previous site relied on a stock theme that limited merchandising and slowed 
         src={mobile1200.src}
         srcset={`${mobile768.src} 768w, ${mobile1200.src} 1200w, ${mobileFull.src} 1440w`}
         sizes="(max-width: 768px) 100vw, 768px"
-        alt="Homepage on mobile — hero, CTA, and above-the-fold content"
+        alt="Homepage on mobile - hero, CTA, and above-the-fold content"
         loading="lazy"
         decoding="async"
-        class="w-full object-cover"
-        style="display:block; aspect-ratio: 9/16;"
+        class="gallery-thumb"
         data-full={mobileFull.src}
       />
     </picture>
-    <figcaption>Homepage (mobile)</figcaption>
+    <figcaption>Homepage (mobile) - clearer hierarchy and stronger above-the-fold calls to action</figcaption>
   </figure>
 
   {/* Mobile navigation */}
-  <figure class="tile">
-    <picture>
+  <figure class="tile tile-mobile">
+    <picture class="tile-media">
       <source
         srcset={`${mobileux768.src} 768w, ${mobileux1200.src} 1200w, ${mobileuxFull.src} 1440w`}
         type="image/webp"
@@ -117,17 +133,16 @@ The previous site relied on a stock theme that limited merchandising and slowed 
         alt="Mobile navigation menu showcasing clear categories and utilities"
         loading="lazy"
         decoding="async"
-        class="w-full object-cover"
-        style="display:block; aspect-ratio: 9/16;"
+        class="gallery-thumb"
         data-full={mobileuxFull.src}
       />
     </picture>
-    <figcaption>Mobile navigation</figcaption>
+    <figcaption>Mobile navigation - simplified access to key categories, search, and utility links</figcaption>
   </figure>
 
   {/* PDP */}
-  <figure class="tile">
-    <picture>
+  <figure class="tile tile-desktop">
+    <picture class="tile-media">
       <source
         srcset={`${product768.src} 768w, ${product1200.src} 1200w, ${productFull.src} 1600w`}
         type="image/webp"
@@ -139,12 +154,96 @@ The previous site relied on a stock theme that limited merchandising and slowed 
         alt="Product page showing gallery, pricing, promotions, and purchase actions"
         loading="lazy"
         decoding="async"
-        class="w-full object-cover"
-        style="display:block; aspect-ratio: 16/9;"
+        class="gallery-thumb"
         data-full={productFull.src}
       />
     </picture>
-    <figcaption>Product page (PDP)</figcaption>
+    <figcaption>Product page (PDP) - tighter product storytelling, offer framing, and conversion support</figcaption>
+  </figure>
+
+  {/* Engagement collection */}
+  <figure class="tile tile-desktop">
+    <picture class="tile-media">
+      <source
+        srcset={`${engagement768.src} 768w, ${engagement1200.src} 1200w, ${engagementFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={engagement1200.src}
+        srcset={`${engagement768.src} 768w, ${engagement1200.src} 1200w, ${engagementFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Engagement rings collection with guided shopping categories and curated inventory"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={engagementFull.src}
+      />
+    </picture>
+    <figcaption>Engagement Rings collection - guided shopping categories with cleaner collection storytelling</figcaption>
+  </figure>
+
+  {/* Bracelets collection */}
+  <figure class="tile tile-desktop">
+    <picture class="tile-media">
+      <source
+        srcset={`${bracelets768.src} 768w, ${bracelets1200.src} 1200w, ${braceletsFull.src} 1600w`}
+        type="image/webp"
+      />
+      <img
+        src={bracelets1200.src}
+        srcset={`${bracelets768.src} 768w, ${bracelets1200.src} 1200w, ${braceletsFull.src} 1600w`}
+        sizes="(max-width: 900px) 100vw, 1200px"
+        alt="Bracelets collection with product cards, pricing, and merchandising controls"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={braceletsFull.src}
+      />
+    </picture>
+    <figcaption>Bracelets collection - clearer product scanning and stronger merchandising consistency</figcaption>
+  </figure>
+
+  {/* Engagement collection (mobile) */}
+  <figure class="tile tile-mobile">
+    <picture class="tile-media">
+      <source
+        srcset={`${engagementMobile768.src} 768w, ${engagementMobile1200.src} 1200w, ${engagementMobileFull.src} 1440w`}
+        type="image/webp"
+      />
+      <img
+        src={engagementMobile1200.src}
+        srcset={`${engagementMobile768.src} 768w, ${engagementMobile1200.src} 1200w, ${engagementMobileFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Engagement rings collection on mobile with guided category shortcuts and improved browsing"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={engagementMobileFull.src}
+      />
+    </picture>
+    <figcaption>Engagement Rings (mobile) - stronger category shortcuts and a cleaner browse-first experience</figcaption>
+  </figure>
+
+  {/* Product page (mobile) */}
+  <figure class="tile tile-mobile">
+    <picture class="tile-media">
+      <source
+        srcset={`${productMobile768.src} 768w, ${productMobile1200.src} 1200w, ${productMobileFull.src} 1440w`}
+        type="image/webp"
+      />
+      <img
+        src={productMobile1200.src}
+        srcset={`${productMobile768.src} 768w, ${productMobile1200.src} 1200w, ${productMobileFull.src} 1440w`}
+        sizes="(max-width: 768px) 100vw, 768px"
+        alt="Product detail page on mobile with a strong hero, product storytelling, and conversion support"
+        loading="lazy"
+        decoding="async"
+        class="gallery-thumb"
+        data-full={productMobileFull.src}
+      />
+    </picture>
+    <figcaption>Product page (mobile) - stronger above-the-fold storytelling and clearer conversion cues</figcaption>
   </figure>
 
 </div>
+

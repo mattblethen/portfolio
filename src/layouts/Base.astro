@@ -1,6 +1,14 @@
 ---
 import "../styles/global.css";
-import Analytics from '@vercel/analytics/astro'
+import Analytics from "@vercel/analytics/astro";
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_TITLE,
+  buildBreadcrumbJsonLd,
+  buildProfessionalServiceJsonLd,
+  buildWebSiteJsonLd,
+} from "../lib/seo";
 
 /**
  * Props:
@@ -12,9 +20,9 @@ import Analytics from '@vercel/analytics/astro'
  * structuredData?: any[]
  */
 const {
-  title = "Matt — Full-Stack Shopify & Web Developer",
-  description = "Custom Shopify 2.0 themes, Liquid, performance, integrations, and full-stack web builds.",
-  image = "/images/og-default.jpg",
+  title = DEFAULT_TITLE,
+  description = DEFAULT_DESCRIPTION,
+  image = DEFAULT_OG_IMAGE,
   noindex = false,
   breadcrumbs = [],
   structuredData = [],
@@ -22,12 +30,9 @@ const {
 
 const siteOrigin = Astro.site ? (Astro.site as URL).origin : "https://mattblethen.com";
 const canonical = siteOrigin + Astro.url.pathname;
-
-// Normalize OG image to absolute
 const ogImage =
   typeof image === "string" && image.startsWith("http") ? image : siteOrigin + image;
 
-// Default breadcrumbs: Home > Current Page
 const crumbList = breadcrumbs.length
   ? breadcrumbs
   : [
@@ -35,63 +40,12 @@ const crumbList = breadcrumbs.length
       { name: title, url: canonical },
     ];
 
-// BreadcrumbList JSON-LD
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: crumbList.map((c: { name: string; url?: string }, i: number) => ({
-    "@type": "ListItem",
-    position: i + 1,
-    name: c.name,
-    ...(c.url ? { item: c.url } : {}),
-  })),
-};
-
-// Site-level WebSite JSON-LD
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "Matt Blethen — Shopify & Web Developer",
-  url: siteOrigin,
-  potentialAction: {
-    "@type": "SearchAction",
-    target: `${siteOrigin}/search?q={search_term_string}`,
-    "query-input": "required name=search_term_string",
-  },
-};
-
-// Business JSON-LD
-const professionalServiceJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  name: "Matt Blethen — Shopify & Web Developer",
-  url: siteOrigin,
-  image: siteOrigin + "/images/profile.png",
-  description:
-    "Nationwide remote Shopify development and web design, with local availability in Richmond, Lexington, and Central Kentucky.",
-  serviceArea: { "@type": "Country", name: "United States" },
-  areaServed: [
-    "Richmond, KY",
-    "Lexington, KY",
-    "Berea, KY",
-    "Winchester, KY",
-    "Nicholasville, KY",
-    "Georgetown, KY",
-    "Versailles, KY",
-    "Danville, KY",
-    "Lancaster, KY",
-    "Irvine, KY",
-  ].map((c) => ({ "@type": "City", name: c })),
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Richmond",
-    addressRegion: "KY",
-    addressCountry: "US",
-  },
-  sameAs: [],
-};
-
-const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd, ...structuredData];
+const jsonLdBlocks = [
+  buildWebSiteJsonLd(siteOrigin),
+  buildProfessionalServiceJsonLd(siteOrigin),
+  buildBreadcrumbJsonLd(crumbList),
+  ...structuredData,
+];
 ---
 <!doctype html>
 <html lang="en">
@@ -107,43 +61,28 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
     )}
     <link rel="canonical" href={canonical} />
 
-    <!-- Social / Open Graph -->
-    <meta property="og:site_name" content="Matt Blethen — Shopify & Web Developer" />
+    <meta property="og:site_name" content="Matt Blethen" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
-    <!-- Theming -->
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
 
-    <!-- Icons -->
-    <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Fonts: using system stack (Inter removed to avoid render-blocking) -->
-    {/*
-      If you decide to self-host Inter later:
-      - preload woff2 weights you use with rel="preload" as="font" crossorigin
-      - use font-display: swap
-    */}
-
-    <!-- JSON-LD (site / business / breadcrumbs) + per-page injections -->
     {jsonLdBlocks.map((obj) => (
-      <script type="application/ld+json" set:html={JSON.stringify(obj)}></script>
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(obj)}></script>
     ))}
 
-    <!-- Page-level <head> slot -->
     <slot name="head" />
 
     <style>
@@ -165,7 +104,7 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
         min-height: 64px;
         gap: 16px;
       }
-      .brand { font-weight: 800; letter-spacing: .2px; white-space: nowrap; }
+      .brand { font-weight: 800; letter-spacing: 0.2px; white-space: nowrap; }
 
       .primary-nav { display: flex; align-items: center; gap: 14px; }
       .menu-toggle {
@@ -192,7 +131,8 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
         .nav-list {
           position: fixed;
           top: 64px;
-          left: 0; right: 0;
+          left: 0;
+          right: 0;
           display: none;
           flex-direction: column;
           gap: 0;
@@ -227,7 +167,6 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
     </style>
   </head>
   <body>
-    <!-- Header / Nav -->
     <header class="site-header">
       <div class="wrap">
         <a class="brand" href="/">Matt Blethen</a>
@@ -256,13 +195,11 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
       </div>
     </header>
 
-    <!-- Page content -->
     <slot />
 
-    <!-- Footer -->
     <footer class="site-footer">
       <div class="wrap">
-        <p>© {new Date().getFullYear()} Matt Blethen</p>
+        <p>&copy; {new Date().getFullYear()} Matt Blethen</p>
         <div class="foot-links">
           <a href="mailto:mattblethen@gmail.com">mattblethen@gmail.com</a>
         </div>
@@ -270,7 +207,6 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
     </footer>
 
     <script is:inline>
-      // Accessible mobile nav toggle
       (function () {
         const btn = document.querySelector('.menu-toggle');
         const list = document.getElementById('primary-menu');
@@ -298,6 +234,6 @@ const jsonLdBlocks = [websiteJsonLd, professionalServiceJsonLd, breadcrumbJsonLd
         });
       })();
     </script>
-    <Analytics/>
+    <Analytics />
   </body>
 </html>

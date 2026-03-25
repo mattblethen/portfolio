@@ -1,6 +1,6 @@
----
+﻿---
 import Base from "../../layouts/Base.astro";
-import { getCollection, render } from "astro:content";
+import { getCollection, render, type CollectionEntry } from "astro:content";
 import Img from "../../components/Img.astro";
 
 // Build all project pages at build time
@@ -12,7 +12,7 @@ export async function getStaticPaths() {
   }));
 }
 
-const { entry } = Astro.props;
+const { entry } = Astro.props as { entry: CollectionEntry<"projects"> };
 const { Content } = await render(entry);
 
 // Frontmatter fields
@@ -30,9 +30,9 @@ const {
   testimonial = null,
   status,
   available,
-} = entry.data as any;
+} = entry.data;
 
-/** Detect “Available Site” demo projects */
+/** Detect "Available Site" demo projects */
 const tagList = (tags as string[]).map((x) => (x || "").toLowerCase());
 const isAvailableSite =
   (status && status.toString().toLowerCase() === "available") ||
@@ -43,26 +43,56 @@ const isAvailableSite =
 const assetUrls = import.meta.glob("../../assets/images/**/*", {
   eager: true,
   import: "default",
-}) as Record<string, string>;
+}) as Record<string, string | { src?: string }>;
+
+function normalizeAssetUrl(value?: string | { src?: string }) {
+  if (!value) return undefined;
+  if (typeof value === "string") return value;
+  if (typeof value === "object" && typeof value.src === "string") return value.src;
+  return undefined;
+}
+
+function resolveLegacyAssetKey(input?: string) {
+  if (!input || !input.startsWith("/images/")) return undefined;
+  return "../.." + input.replace("/images", "/assets/images");
+}
 
 function resolveAssetUrl(input?: string): string | undefined {
   if (!input) return undefined;
   if (/^https?:\/\//i.test(input)) return input;
 
-  if (input.startsWith("/images/")) {
-    const baseKey = ".." + input.replace("/images", "/assets/images");
-    const withWebp = baseKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, ".webp");
-    const with1200 = baseKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, "-1200.webp");
-    if (assetUrls[with1200]) return assetUrls[with1200];
-    if (assetUrls[withWebp]) return assetUrls[withWebp];
-    if (assetUrls[baseKey]) return assetUrls[baseKey];
-    return input;
-  }
-  return input;
+  const baseKey = resolveLegacyAssetKey(input);
+  if (!baseKey) return input;
+
+  const withWebp = baseKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, ".webp");
+  const with1200 = baseKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, "-1200.webp");
+  return normalizeAssetUrl(assetUrls[with1200])
+    ?? normalizeAssetUrl(assetUrls[withWebp])
+    ?? normalizeAssetUrl(assetUrls[baseKey])
+    ?? input;
 }
 
-function withSuffix(u: string, suffix: string) {
-  return u.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, `${suffix}.webp`);
+function resolveAssetSet(input?: string) {
+  if (!input) return { src: undefined, mobile: undefined, large: undefined };
+  if (/^https?:\/\//i.test(input)) {
+    return { src: input, mobile: undefined, large: undefined };
+  }
+
+  const baseKey = resolveLegacyAssetKey(input);
+  if (!baseKey) {
+    return { src: input, mobile: undefined, large: undefined };
+  }
+
+  const original = normalizeAssetUrl(assetUrls[baseKey]);
+  const webp = normalizeAssetUrl(assetUrls[baseKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, ".webp")]);
+  const mobile = normalizeAssetUrl(assetUrls[baseKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, "-768.webp")]);
+  const large = normalizeAssetUrl(assetUrls[baseKey.replace(/\.(png|jpe?g|gif|tiff|bmp|webp)$/i, "-1200.webp")]);
+
+  return {
+    src: large ?? webp ?? original ?? input,
+    mobile,
+    large: large ?? webp ?? original ?? input,
+  };
 }
 
 function extractDimsFromFilename(u?: string): { w: number; h: number } | null {
@@ -75,11 +105,15 @@ function extractDimsFromFilename(u?: string): { w: number; h: number } | null {
   return null;
 }
 
-const heroUrlRaw = resolveAssetUrl(hero);
+const heroImage = resolveAssetSet(hero);
+const heroUrlRaw = heroImage.src;
 const testimonialPhotoUrl = resolveAssetUrl(testimonial?.photo);
 const heroDims = extractDimsFromFilename(heroUrlRaw) ?? { w: 1200, h: 675 };
-const heroMobile = heroUrlRaw ? withSuffix(heroUrlRaw, "-768") : undefined;
-const heroLarge = heroUrlRaw ? withSuffix(heroUrlRaw, "-1200") : undefined;
+const heroMobile = heroImage.mobile;
+const heroLarge = heroImage.large;
+const heroSrcSet = [heroMobile ? `${heroMobile} 768w` : null, `${heroLarge ?? heroUrlRaw} 1200w`]
+  .filter(Boolean)
+  .join(", ");
 
 const t = tagList;
 const isDesign = t.includes("design") || t.includes("graphic") || t.includes("print");
@@ -99,8 +133,7 @@ const heroAbs = toAbsolute(heroUrlRaw);
 
 let year: string | null = null;
 if (date) {
-  const d = new Date(date as any);
-  if (!isNaN(d.getTime())) year = String(d.getFullYear());
+  year = String(date.getFullYear());
 }
 
 const projectSchema = {
@@ -110,7 +143,7 @@ const projectSchema = {
   headline: title,
   description: summary ?? "Project case study by Matt Blethen",
   image: heroAbs ?? undefined,
-  datePublished: date ? new Date(date as any).toISOString().slice(0, 10) : undefined,
+  datePublished: date?.toISOString().slice(0, 10),
   url: projectUrl,
   creator: { "@type": "Person", name: "Matt Blethen", url: siteOrigin },
   keywords: tags,
@@ -154,23 +187,14 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
       <link
         rel="preload"
         as="image"
-        imagesrcset={`${heroMobile ?? ""} 768w, ${heroLarge ?? heroUrlRaw} 1200w`}
+        imagesrcset={heroSrcSet}
         imagesizes="(max-width: 640px) 100vw, (max-width: 1200px) 100vw, 1200px"
       />
     ) : null}
   </Fragment>
 
   <style>
-    .project-grid {{
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
-      gap: 28px;
-    }}
-    @media (max-width: 960px) {{
-      .project-grid {{ grid-template-columns: 1fr; }}
-      .project-grid aside {{ order: 2; }}
-    }}
-    .warning-bar {{
+    .warning-bar {
       background: #fffbe5;
       border: 1px solid #f5d25b;
       border-radius: 8px;
@@ -180,39 +204,145 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
       color: #6b5500;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06);
       line-height: 1.4;
-    }}
-    .warning-bar strong {{ color: #c27a00; }}
-    .project-hero .hero-img img {{
-      border-radius: var(--radius);
-      object-fit: cover;
-      width: 100%;
-      height: auto;
-      display: block;
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-    }}
-    .testimonial .avatar,
-    .testimonial .avatar img {{
-      width: 64px; height: 64px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid var(--line);
-      display: block;
-    }}
-    .testimonial {{
-      display: grid;
-      grid-template-columns: 64px 1fr;
-      gap: 14px;
+    }
+    .warning-bar strong { color: #c27a00; }
+    .project-page {
+      padding-top: 28px;
+      padding-bottom: 40px;
+    }
+    .project-page .crumbs {
+      margin-bottom: 20px;
+    }
+    .project-hero {
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 420px);
       align-items: start;
-    }}
-    .testimonial blockquote {{ margin: 0; font-size: 1.02rem; line-height: 1.55; }}
-    .testimonial footer {{ margin-top: 8px; color: var(--muted, #555); font-size: .95rem; }}
-    .stars {{ display: inline-flex; gap: 2px; margin-left: 8px; font-size: .95rem; }}
-    .stars .on {{ opacity: 1; }}
-    .stars .off {{ opacity: .25; }}
+      gap: 32px;
+      margin-top: 0;
+    }
+    .project-page .title {
+      font-size: clamp(2.6rem, 4.4vw, 4.5rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      max-width: 12ch;
+      text-wrap: balance;
+    }
+    .project-page .lede {
+      font-size: 1.08rem;
+      line-height: 1.65;
+      max-width: 60ch;
+      margin-top: 1rem;
+    }
+    .project-page .meta {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 20px 0 0;
+      gap: 10px;
+    }
+    .project-page .meta .chip {
+      background: #f7f8fb;
+      color: #3659a7;
+      border-color: #d8e2f4;
+      font-weight: 600;
+    }
+    .project-page .links {
+      margin-top: 18px;
+    }
+    .project-hero .hero-img {
+      width: 100%;
+      min-height: 360px;
+      aspect-ratio: 4 / 5;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 6px);
+      background: linear-gradient(180deg, #fafcff 0%, #f3f6fb 100%);
+      box-shadow: var(--shadow);
+      padding: 0;
+      overflow: hidden;
+      align-self: start;
+    }
+    .project-hero .hero-img img {
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      width: 100%;
+      height: 100%;
+      margin-bottom: 0;
+      object-fit: cover;
+      object-position: center top;
+    }
+    .project-grid {
+      align-items: start;
+      gap: 24px;
+    }
+    .project-grid > div {
+      min-width: 0;
+    }
+    .project-grid aside {
+      position: sticky;
+      top: 88px;
+      align-self: start;
+    }
+    .project-grid .card {
+      padding: 22px;
+    }
+    .project-grid .card + .card {
+      margin-top: 18px;
+    }
+    .project-grid article.card :where(h2, h3) {
+      margin-top: 0;
+    }
+    .project-grid .list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 1.15rem;
+    }
+    .project-grid .outcomes-list li,
+    .project-grid .list li {
+      margin-left: 0;
+      line-height: 1.55;
+    }
+    .project-grid article.card > :last-child,
+    .project-grid aside .card > :last-child {
+      margin-bottom: 0;
+    }
+    .case-gallery-castle {
+      margin-top: 18px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .case-gallery-castle .tile {
+      background: linear-gradient(180deg, #ffffff 0%, #fafbfe 100%);
+    }
+    .case-gallery-castle .tile img {
+      background: #f4f7fb;
+    }
+    .bottom-nav {
+      margin-top: 40px;
+    }
+    @media (max-width: 1100px) {
+      .project-hero {
+        grid-template-columns: minmax(0, 1fr) 360px;
+      }
+    }
+    @media (max-width: 960px) {
+      .project-page .title {
+        max-width: none;
+        font-size: clamp(2.2rem, 9vw, 3.6rem);
+      }
+      .project-hero {
+        grid-template-columns: 1fr;
+      }
+      .project-hero .hero-img {
+        min-height: 0;
+        aspect-ratio: 16 / 10;
+      }
+      .project-grid aside {
+        position: static;
+      }
+    }
   </style>
 
-  <div class="wrap project">
+  <div class="wrap project project-page">
     <!-- Breadcrumbs -->
     <nav class="crumbs" aria-label="breadcrumbs">
       <a href="/">Home</a> &nbsp;/&nbsp; <a href="/#projects">Projects</a> &nbsp;/&nbsp; {title}
@@ -235,7 +365,7 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
         <div class="meta" aria-label="Project meta">
           {client ? <span class="chip">Client: {client}</span> : null}
           {year ? <span class="chip">Year: {year}</span> : null}
-          {isDesign ? <span class="chip">Format: 8.5×11 in</span> : null}
+          {isDesign ? <span class="chip">Format: 8.5 x 11 in</span> : null}
         </div>
 
         {links?.live ? (
@@ -248,8 +378,8 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
       {heroUrlRaw ? (
         <figure class="hero-img">
           <picture>
-            <source srcset={heroMobile} type="image/webp" media="(max-width: 640px)" />
-            <source srcset={heroLarge} type="image/webp" media="(max-width: 1200px)" />
+            {heroMobile ? <source srcset={heroMobile} type="image/webp" media="(max-width: 640px)" /> : null}
+            {heroLarge ? <source srcset={heroLarge} type="image/webp" media="(max-width: 1200px)" /> : null}
             <img
               src={heroLarge ?? heroUrlRaw}
               alt={title + " hero image"}
@@ -280,24 +410,24 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
                 <Img
                   class="avatar"
                   src={testimonialPhotoUrl}
-                  alt={(testimonial.name ?? "Client") + " — photo"}
+                  alt={(testimonial.name ?? "Client") + " photo"}
                   width={64}
                   height={64}
                   loading="lazy"
                   decoding="async"
                 />
               ) : (
-                <div class="avatar" style="display:flex;align-items:center;justify-content:center;background:#f2f2f2;">👤</div>
+                <div class="avatar" style="display:flex;align-items:center;justify-content:center;background:#f2f2f2;">Client</div>
               )}
               <div>
-                <blockquote>“{testimonial.quote}”</blockquote>
+                <blockquote>"{testimonial.quote}"</blockquote>
                 <footer>
                   <strong>{testimonial.name ?? "Client"}</strong>
-                  {testimonial.title ? <> — {testimonial.title}</> : null}
+                  {testimonial.title ? <> - {testimonial.title}</> : null}
                   {typeof testimonial.rating === "number" ? (
                     <span class="stars" aria-label={`Rating ${testimonial.rating} out of 5`}>
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <span class={i < (testimonial.rating as number) ? "on" : "off"}>★</span>
+                        <span class={i < (testimonial.rating as number) ? "on" : "off"}>&#9733;</span>
                       ))}
                     </span>
                   ) : null}
@@ -348,13 +478,15 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
     </section>
 
     <div id="gallery-modal" class="gallery-modal" hidden aria-hidden="true" role="dialog" aria-label="Image preview">
-      <button class="close" aria-label="Close preview">&times;</button>
-      <img id="gallery-modal-img" alt="" />
+      <div class="gallery-modal__dialog">
+        <button class="close" aria-label="Close preview">&times;</button>
+        <img id="gallery-modal-img" alt="" />
+      </div>
     </div>
 
     <div class="bottom-nav">
-      <a href="/#projects">← Back to Projects</a>
-      <a href="/contact">Start a project →</a>
+      <a href="/#projects">&larr; Back to Projects</a>
+      <a href="/contact">Start a project &rarr;</a>
     </div>
   </div>
 
@@ -394,3 +526,4 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
     })();
   </script>
 </Base>
+
