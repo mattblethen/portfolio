@@ -10,15 +10,6 @@ import {
   buildWebSiteJsonLd,
 } from "../lib/seo";
 
-/**
- * Props:
- * title?: string
- * description?: string
- * image?: string
- * noindex?: boolean
- * breadcrumbs?: Array<{ name: string; url?: string }>
- * structuredData?: any[]
- */
 const {
   title = DEFAULT_TITLE,
   description = DEFAULT_DESCRIPTION,
@@ -73,8 +64,7 @@ const jsonLdBlocks = [
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f5f2ea" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/site.webmanifest" />
@@ -84,92 +74,18 @@ const jsonLdBlocks = [
     ))}
 
     <slot name="head" />
-
-    <style>
-      html, body { overflow-x: hidden; }
-
-      header.site-header {
-        position: sticky; top: 0;
-        background: rgba(255,255,255,0.9);
-        -webkit-backdrop-filter: saturate(130%) blur(8px);
-        backdrop-filter: saturate(130%) blur(8px);
-        border-bottom: 1px solid var(--line);
-        z-index: 100;
-        width: 100%;
-      }
-      .site-header .wrap {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 64px;
-        gap: 16px;
-      }
-      .brand { font-weight: 800; letter-spacing: 0.2px; white-space: nowrap; }
-
-      .primary-nav { display: flex; align-items: center; gap: 14px; }
-      .menu-toggle {
-        display: none;
-        background: transparent;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        padding: 8px 10px;
-        line-height: 0;
-      }
-      .menu-toggle svg { width: 22px; height: 22px; }
-
-      .nav-list {
-        display: flex;
-        gap: 20px;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-      .nav-list a { color: var(--text); text-decoration: none; }
-
-      @media (max-width: 860px) {
-        .menu-toggle { display: inline-flex; }
-        .nav-list {
-          position: fixed;
-          top: 64px;
-          left: 0;
-          right: 0;
-          display: none;
-          flex-direction: column;
-          gap: 0;
-          background: #fff;
-          border-bottom: 1px solid var(--line);
-          z-index: 90;
-        }
-        .nav-list.open { display: flex; }
-        .nav-list li { border-top: 1px solid var(--line); }
-        .nav-list li:first-child { border-top: 0; }
-        .nav-list a { display: block; padding: 14px 20px; }
-      }
-
-      footer.site-footer { border-top: 1px solid var(--line); width: 100%; }
-      .site-footer .wrap {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-        min-height: 72px;
-        flex-wrap: wrap;
-      }
-      .foot-links { display: flex; gap: 16px; flex-wrap: wrap; }
-      @media (max-width: 720px) {
-        .site-footer .wrap {
-          flex-direction: column;
-          align-items: flex-start;
-          padding-top: 16px;
-          padding-bottom: 16px;
-        }
-      }
-    </style>
   </head>
   <body>
     <header class="site-header">
-      <div class="wrap">
-        <a class="brand" href="/">Matt Blethen</a>
+      <div class="wrap site-header__inner">
+        <a class="brand-lockup" href="/" aria-label="Matt Blethen home">
+          <img
+            src="/images/brand/mb-logo.png"
+            alt="Matt Blethen Web Design and Development"
+            width="530"
+            height="320"
+          />
+        </a>
 
         <nav class="primary-nav" aria-label="Primary">
           <button
@@ -178,18 +94,18 @@ const jsonLdBlocks = [
             aria-expanded="false"
             aria-controls="primary-menu"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
+            <span></span>
+            <span></span>
+            <span></span>
           </button>
 
           <ul id="primary-menu" class="nav-list">
-            <li><a href="/#projects">Projects</a></li>
             <li><a href="/#services">Services</a></li>
-            <li><a href="/contact">Contact</a></li>
+            <li><a href="/#ready-to-launch">Ready to Launch</a></li>
+            <li><a href="/#work">Work</a></li>
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#faq">FAQ</a></li>
+            <li class="nav-list__cta"><a class="btn btn--solid" href="/contact">Let's Talk</a></li>
           </ul>
         </nav>
       </div>
@@ -198,39 +114,76 @@ const jsonLdBlocks = [
     <slot />
 
     <footer class="site-footer">
-      <div class="wrap">
-        <p>&copy; {new Date().getFullYear()} Matt Blethen</p>
-        <div class="foot-links">
-          <a href="mailto:mattblethen@gmail.com">mattblethen@gmail.com</a>
+      <div class="wrap site-footer__grid">
+        <div class="site-footer__brand">
+          <img
+            src="/images/brand/mb-logo.png"
+            alt="Matt Blethen Web Design and Development"
+            width="530"
+            height="320"
+          />
+          <p>
+            Websites for artists, makers, and small businesses that need something clear,
+            credible, and ready to help bring in customers.
+          </p>
         </div>
+
+        <div>
+          <h2>Services</h2>
+          <ul class="footer-list">
+            <li><a href="/#services">Custom Websites</a></li>
+            <li><a href="/#services">eCommerce Stores</a></li>
+            <li><a href="/#ready-to-launch">Ready to Launch Sites</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>Quick Links</h2>
+          <ul class="footer-list">
+            <li><a href="/#work">Work</a></li>
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#faq">FAQ</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>Let's Connect</h2>
+          <ul class="footer-list">
+            <li><a href="mailto:mattblethen@gmail.com">mattblethen@gmail.com</a></li>
+            <li><span>Remote nationwide</span></li>
+            <li><span>Based in Kentucky</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="wrap site-footer__bottom">
+        <p>&copy; {new Date().getFullYear()} Matt Blethen. All rights reserved.</p>
       </div>
     </footer>
 
     <script is:inline>
       (function () {
-        const btn = document.querySelector('.menu-toggle');
-        const list = document.getElementById('primary-menu');
+        var btn = document.querySelector('.menu-toggle');
+        var list = document.getElementById('primary-menu');
         if (!btn || !list) return;
 
-        function closeOnOutsideClick(e) {
-          if (!list.contains(e.target) && !btn.contains(e.target)) {
-            list.classList.remove('open');
-            btn.setAttribute('aria-expanded', 'false');
-            document.removeEventListener('click', closeOnOutsideClick);
-          }
+        function closeMenu() {
+          list.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
         }
 
-        btn.addEventListener('click', () => {
-          const open = list.classList.toggle('open');
+        btn.addEventListener('click', function () {
+          var open = list.classList.toggle('open');
           btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-          if (open) setTimeout(() => document.addEventListener('click', closeOnOutsideClick), 0);
         });
 
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && list.classList.contains('open')) {
-            list.classList.remove('open');
-            btn.setAttribute('aria-expanded', 'false');
-          }
+        list.querySelectorAll('a').forEach(function (link) {
+          link.addEventListener('click', closeMenu);
+        });
+
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeMenu();
         });
       })();
     </script>

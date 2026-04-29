@@ -9,7 +9,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro",
-    "vercel-build": "astro build --verbose",
+    "vercel-build": "astro build",
     "capture": "node capture.js",
     "img:sync": "node scripts/sync-images.mjs",
     "img:opt": "node scripts/sync-images.mjs",
