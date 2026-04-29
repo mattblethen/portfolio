@@ -298,7 +298,7 @@ ul {
 .hero-v2__inner {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(340px, 1.08fr) minmax(460px, 0.92fr);
+  grid-template-columns: minmax(420px, 1.2fr) minmax(440px, 0.8fr);
   gap: 1.2rem;
   align-items: center;
   min-height: min(67vh, 620px);
@@ -307,7 +307,7 @@ ul {
 .hero-v2__copy {
   position: relative;
   z-index: 2;
-  max-width: 34rem;
+  max-width: 40rem;
   padding: 1.2rem 0 1.5rem;
   animation: rise-in 700ms ease both;
 }
@@ -324,18 +324,12 @@ ul {
 }
 
 .hero-v2 h1 {
-  display: grid;
-  max-width: 12.2ch;
-  font-size: clamp(2.35rem, 4.95vw, 4.4rem);
+  max-width: 14.5ch;
+  font-size: clamp(2.3rem, 4.5vw, 4rem);
   line-height: 0.94;
   margin-bottom: 1rem;
   letter-spacing: -0.04em;
-  text-wrap: pretty;
   text-shadow: 0 10px 26px rgba(255, 250, 241, 0.45);
-}
-
-.hero-v2 h1 span {
-  display: block;
 }
 
 .hero-v2 h1 em {
