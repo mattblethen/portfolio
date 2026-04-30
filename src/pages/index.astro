@@ -1,13 +1,8 @@
 ---
-import { Image } from "astro:assets";
 import { getCollection, type CollectionEntry } from "astro:content";
 import Img from "../components/Img.astro";
 import Base from "../layouts/Base.astro";
-import castleHeroSrc from "../assets/images/projects/castlejewelry/hero.png";
-import wwbcHeroSrc from "../assets/images/projects/WWBC/wildwestbeardco-com-collections-western-breeze-20251024-130137.png";
-import davinciHeroSrc from "../assets/images/projects/davinci/www-davinciradiance-com-20251125-104448-mobile.png";
-import highlandHeroSrc from "../assets/images/projects/rkyhighlandgames/01-home-desktop.png";
-import profileSrc from "../assets/images/profile.png";
+import { Image } from "astro:assets";
 import ctaBgSrc from "../assets/images/castle-hero.png";
 import { SITE_URL, buildFAQJsonLd, buildOfferCatalogJsonLd } from "../lib/seo";
 
@@ -136,10 +131,10 @@ const offerCatalog = buildOfferCatalogJsonLd(SITE_URL);
         <div class="hero-v2__copy">
           <p class="hero-v2__eyebrow">Built with heart. Designed with purpose. Made to work.</p>
           <h1 id="hero-title">
-            Websites that<br />
-            bring your vision<br />
-            to life and <em>your</em><br />
-            <em>people</em> to you.
+            <span>Websites that bring</span>
+            <span>your vision to life</span>
+            <span>and <em>your</em></span>
+            <span><em><u>people</u> to you.</em></span>
           </h1>
           <p class="hero-v2__lede">
             Custom websites for creative entrepreneurs and small businesses ready to grow.
@@ -151,29 +146,16 @@ const offerCatalog = buildOfferCatalogJsonLd(SITE_URL);
         </div>
 
         <div class="hero-v2__visual" aria-hidden="true">
-          <div class="hero-v2__project hero-v2__project--left">
-            <Image src={castleHeroSrc} alt="" widths={[320, 520, 720]} sizes="22vw" loading="eager" decoding="async" />
-          </div>
-          <div class="hero-v2__project hero-v2__project--top">
-            <Image src={davinciHeroSrc} alt="" widths={[320, 520, 720]} sizes="20vw" loading="eager" decoding="async" />
-          </div>
-          <div class="hero-v2__project hero-v2__project--right">
-            <Image src={highlandHeroSrc} alt="" widths={[320, 520, 720]} sizes="18vw" loading="eager" decoding="async" />
-          </div>
-          <div class="hero-v2__project hero-v2__project--bottom">
-            <Image src={wwbcHeroSrc} alt="" widths={[320, 520, 720]} sizes="22vw" loading="eager" decoding="async" />
-          </div>
-          <div class="hero-v2__portrait">
-            <Image
-              src={profileSrc}
-              alt=""
-              widths={[420, 620, 820]}
-              sizes="(max-width: 1024px) 84vw, 38vw"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-            />
-          </div>
+          <Img
+            class="hero-v2__composite"
+            src="/images/hero/homepage-hero-collage.png"
+            alt=""
+            width="1800"
+            height="1400"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
         </div>
       </div>
     </section>
@@ -204,7 +186,7 @@ const offerCatalog = buildOfferCatalogJsonLd(SITE_URL);
     <section class="offers-section wrap" id="services" aria-labelledby="services-title">
       <div class="section-heading">
         <p class="section-kicker">Ways we can work together</p>
-        <h2 id="services-title">Two ways to work together</h2>
+        <h2 id="services-title">Multiple ways to work together</h2>
         <p>
           Most of my clients start with a conversation. Let&apos;s see if we&apos;re a good fit.
         </p>
