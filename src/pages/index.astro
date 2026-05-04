@@ -90,6 +90,57 @@ function isDesignOnly(entry: CollectionEntry<"projects">) {
 const recentWork = entries.filter((entry) => !isAvailable(entry) && !isDesignOnly(entry)).slice(0, 5).map(toCard);
 const availableCards = entries.filter(isAvailable).slice(0, 3).map(toCard);
 
+const serviceOffers = [
+  {
+    icon: "monitor",
+    title: "Custom Websites",
+    summary: "Fully custom sites built around your brand, your goals, and how you work.",
+    points: ["Strategy & planning", "Custom design", "Mobile-friendly build", "SEO-ready structure"],
+    href: "/contact",
+    cta: "Learn more",
+  },
+  {
+    icon: "cart",
+    title: "eCommerce Stores",
+    summary: "Online stores that make it easy for people to find what they need and buy with confidence.",
+    points: ["Shopify solutions", "Product-first design", "Smoother mobile UX", "Made to scale"],
+    href: "/contact",
+    cta: "Learn more",
+  },
+  {
+    icon: "rocket",
+    title: "Ready to Launch Sites",
+    summary:
+      "Start with a proven foundation, then I tailor it to your brand, content, and goals so it feels like your business.",
+    points: ["Pre-built layouts that convert", "Faster turnaround", "Lower starting investment", "Customized for your brand"],
+    href: "#ready-to-launch",
+    cta: "Explore options",
+  },
+];
+
+const proofPillars = [
+  {
+    badge: "DC",
+    title: "Direct Communication",
+    text: "You work with me one-on-one, not through layers of account management.",
+  },
+  {
+    badge: "BY",
+    title: "Built Around You",
+    text: "Every site is tailored to your brand, your goals, and how you actually work.",
+  },
+  {
+    badge: "TS",
+    title: "Thoughtful Structure",
+    text: "Strategy, design, and content structure are shaped to be clear and usable.",
+  },
+  {
+    badge: "RG",
+    title: "Ready to Grow",
+    text: "Built to help people trust you, take action, and come back when they are ready.",
+  },
+];
+
 const page = {
   title: "Matt Blethen | Websites for Artists, Makers, and Small Businesses",
   description:
@@ -160,136 +211,187 @@ const offerCatalog = buildOfferCatalogJsonLd(SITE_URL);
       </div>
     </section>
 
-    <section class="trust-strip wrap" aria-label="Trust points">
-      <article>
-        <span class="trust-strip__icon">CT</span>
-        <h2>Built to Connect</h2>
-        <p>Clear sites that turn visitors into customers.</p>
-      </article>
-      <article>
-        <span class="trust-strip__icon">MG</span>
-        <h2>Easy to Manage</h2>
-        <p>Simple to update so your site can keep up with your work.</p>
-      </article>
-      <article>
-        <span class="trust-strip__icon">SE</span>
-        <h2>Found Locally</h2>
-        <p>SEO-ready to help the right people find you.</p>
-      </article>
-      <article>
-        <span class="trust-strip__icon">GR</span>
-        <h2>Made to Grow</h2>
-        <p>Built with your future in mind, not just today.</p>
-      </article>
-    </section>
-
-    <section class="offers-section wrap" id="services" aria-labelledby="services-title">
-      <div class="section-heading">
-        <p class="section-kicker">Ways we can work together</p>
-        <h2 id="services-title">Multiple ways to work together</h2>
-        <p>
-          Most of my clients start with a conversation. Let&apos;s see if we&apos;re a good fit.
-        </p>
-      </div>
-
-      <div class="offers-grid">
-        <article class="offer-card">
-          <div class="offer-card__badge">CW</div>
-          <h3>Custom Websites</h3>
-          <p>Fully custom sites built around your brand, your goals, and how you work.</p>
-          <ul>
-            <li>Strategy and planning</li>
-            <li>Custom design</li>
-            <li>Mobile-friendly build</li>
-            <li>SEO-ready structure</li>
-          </ul>
+    <section class="trust-strip" aria-label="Trust points">
+      <div class="trust-strip__inner wrap">
+        <article>
+          <span class="trust-strip__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.5 13.5 8 16a3 3 0 1 1-4.24-4.24l3-3A3 3 0 0 1 11 8" />
+              <path d="M13.5 10.5 16 8a3 3 0 1 1 4.24 4.24l-3 3A3 3 0 0 1 13 16" />
+              <path d="m9 15 6-6" />
+            </svg>
+          </span>
+          <div class="trust-strip__body">
+            <h2>Built to Connect</h2>
+            <p>Clear sites that turn visitors into customers.</p>
+          </div>
         </article>
-
-        <article class="offer-card">
-          <div class="offer-card__badge">EC</div>
-          <h3>eCommerce Stores</h3>
-          <p>Online stores that make it easy for people to find what they need and buy with confidence.</p>
-          <ul>
-            <li>Shopify-focused</li>
-            <li>Product-first design</li>
-            <li>Smoother mobile UX</li>
-            <li>Ready to scale</li>
-          </ul>
+        <article>
+          <span class="trust-strip__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3.2" />
+              <path d="M12 2.8v2.1M12 19.1v2.1M4.93 4.93l1.48 1.48M17.59 17.59l1.48 1.48M2.8 12h2.1M19.1 12h2.1M4.93 19.07l1.48-1.48M17.59 6.41l1.48-1.48" />
+            </svg>
+          </span>
+          <div class="trust-strip__body">
+            <h2>Easy to Manage</h2>
+            <p>Simple to update so your site can keep up with your work.</p>
+          </div>
         </article>
-
-        <article class="offer-card">
-          <div class="offer-card__badge">RL</div>
-          <h3>Ready to Launch Sites</h3>
-          <p>Start with a proven foundation, then customize it to fit your brand and get up and running faster.</p>
-          <ul>
-            <li>Proven layouts that convert</li>
-            <li>Faster turnaround</li>
-            <li>Lower starting investment</li>
-            <li>Fully customized to you</li>
-          </ul>
+        <article>
+          <span class="trust-strip__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z" />
+              <circle cx="12" cy="10" r="2.2" />
+            </svg>
+          </span>
+          <div class="trust-strip__body">
+            <h2>Found Locally</h2>
+            <p>SEO-ready to help the right people find you.</p>
+          </div>
+        </article>
+        <article>
+          <span class="trust-strip__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 17 17 7" />
+              <path d="M9 7h8v8" />
+            </svg>
+          </span>
+          <div class="trust-strip__body">
+            <h2>Made to Grow</h2>
+            <p>Built with your future in mind, not just today.</p>
+          </div>
         </article>
       </div>
     </section>
 
-    <section class="ready-section wrap" id="ready-to-launch" aria-labelledby="ready-title">
-      <div class="section-heading section-heading--split">
-        <div>
+    <section class="offers-section" id="services" aria-labelledby="services-title">
+      <div class="offers-section__inner wrap">
+        <div class="offers-layout">
+          <div class="offers-intro">
+            <p class="section-kicker">How I usually work</p>
+            <h2 id="services-title">Multiple ways<br />to work together</h2>
+            <p>
+              Most of my clients start with a conversation. Let&apos;s see if we&apos;re a good fit, then choose
+              the path that makes the most sense for your business.
+            </p>
+            <p class="offers-intro__note">
+              <span>Pick the path that fits you<br />(and your goals).</span>
+              <span class="offers-intro__arrow" aria-hidden="true">⟶</span>
+            </p>
+          </div>
+
+          <div class="offers-grid">
+            {serviceOffers.map((offer) => (
+              <article class="offer-card">
+                <div class="offer-card__badge" aria-hidden="true">
+                  {offer.icon === "monitor" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3.5" y="4.5" width="17" height="12" rx="1.5"></rect>
+                      <path d="M9 19.5h6"></path>
+                      <path d="M12 16.5v3"></path>
+                    </svg>
+                  )}
+                  {offer.icon === "cart" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="9" cy="19" r="1.6"></circle>
+                      <circle cx="17" cy="19" r="1.6"></circle>
+                      <path d="M3.5 4.5h2l2.3 9.2h9.1l2.2-6.9H7.1"></path>
+                    </svg>
+                  )}
+                  {offer.icon === "rocket" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M13 2 5 13h5l-1 9 8-11h-5l1-9Z"></path>
+                    </svg>
+                  )}
+                </div>
+                <h3>{offer.title}</h3>
+                <p>{offer.summary}</p>
+                <ul>
+                  {offer.points.map((point) => (
+                    <li>{point}</li>
+                  ))}
+                </ul>
+                <a class="offer-card__link" href={offer.href}>
+                  {offer.cta}
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ready-section" id="ready-to-launch" aria-labelledby="ready-title">
+      <div class="ready-section__inner wrap">
+        <div class="section-heading section-heading--center ready-section__heading">
           <p class="section-kicker">Ready to Launch</p>
           <h2 id="ready-title">A faster path if you already know you need a site.</h2>
-        </div>
-        <p>
-          If custom is not the right starting point, I can adapt a proven structure and shape it around your
-          content, brand, and goals.
-        </p>
-      </div>
-
-      {availableCards.length ? (
-        <div class="ready-grid">
-          {availableCards.map((card) => (
-            <article class="mini-project">
-              <a href={card.url} class="mini-project__media" aria-label={`View ${card.title}`}>
-                <Img
-                  src={card.img}
-                  alt={card.title + " preview"}
-                  width="1200"
-                  height="900"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </a>
-              <div class="mini-project__body">
-                <p>{card.client}</p>
-                <h3>{card.title}</h3>
-              </div>
-            </article>
-          ))}
-        </div>
-      ) : (
-        <div class="ready-callout">
           <p>
-            Ready-to-launch options are meant for people who want a strong starting point without beginning
-            from a blank page. I can show you options and tailor one to fit.
+            Start with a proven foundation, then I tailor it to your brand, content, and goals so it feels like
+            your business, not a generic template.
           </p>
-          <a class="btn btn--ghost" href="/contact">Ask About Ready to Launch Options</a>
         </div>
-      )}
+
+        {availableCards.length ? (
+          <div class="ready-grid">
+            {availableCards.map((card) => (
+              <article class="mini-project">
+                <a href={card.url} class="mini-project__media" aria-label={`View ${card.title}`}>
+                  <Img
+                    src={card.img}
+                    alt={card.title + " preview"}
+                    width="1200"
+                    height="900"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
+                <div class="mini-project__body">
+                  <p>{card.client}</p>
+                  <h3>{card.title}</h3>
+                  <a class="mini-project__link" href={card.url}>View demo</a>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div class="ready-callout">
+            <p>
+              Ready-to-launch options are meant for people who want a strong starting point without beginning
+              from a blank page. I can show you options and tailor one to fit.
+            </p>
+            <a class="btn btn--ghost" href="/contact">Ask About Ready to Launch Options</a>
+          </div>
+        )}
+      </div>
     </section>
 
-    <section class="about-band wrap" id="about" aria-labelledby="about-title">
-      <div class="about-band__copy">
-        <p class="section-kicker">About Matt</p>
-        <h2 id="about-title">Websites for real people doing real things.</h2>
+    <section class="approach-section wrap" id="about" aria-labelledby="about-title">
+      <div class="approach-section__copy">
+        <p class="section-kicker">Why people like working with me</p>
+        <h2 id="about-title">Clear process. Real collaboration. No agency runaround.</h2>
         <p>
-          I work directly with people building something of their own, whether that is a service business,
-          a shop, or something harder to define.
+          You&apos;ll work directly with me from start to finish, keeping things simple, structured, and clear
+          enough that you always know what&apos;s happening and why.
         </p>
         <p>
-          Most of the time, it starts as a conversation. You tell me what you&apos;re trying to build, and
-          I figure out how to turn that into something that actually works online.
+          I ask good questions, listen well, and build websites that are shaped around your business, not a
+          generic process. The result is a site you&apos;re proud of and confident using.
         </p>
+        <p class="approach-section__signature">Matt</p>
       </div>
-      <div class="about-band__note">
-        <p>If it feels like a fit, we&apos;ll know pretty quickly.</p>
+
+      <div class="approach-grid">
+        {proofPillars.map((pillar) => (
+          <article class="approach-card">
+            <div class="approach-card__badge">{pillar.badge}</div>
+            <div>
+              <h3>{pillar.title}</h3>
+              <p>{pillar.text}</p>
+            </div>
+          </article>
+        ))}
       </div>
     </section>
 
