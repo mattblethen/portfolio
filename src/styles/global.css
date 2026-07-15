@@ -1156,6 +1156,29 @@ ul {
   cursor: zoom-in;
 }
 
+.case-gallery-castle .gallery-trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: zoom-in;
+}
+
+.case-gallery-castle .gallery-trigger picture,
+.case-gallery-castle .gallery-trigger img {
+  display: block;
+  width: 100%;
+}
+
+.case-gallery-castle .gallery-trigger:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: -4px;
+}
+
 .case-gallery-castle figcaption {
   padding: 0.75rem 0.9rem 1rem;
   color: var(--muted);

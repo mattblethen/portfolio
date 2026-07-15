@@ -477,7 +477,7 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
       </aside>
     </section>
 
-    <div id="gallery-modal" class="gallery-modal" hidden aria-hidden="true" role="dialog" aria-label="Image preview">
+    <div id="gallery-modal" class="gallery-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image preview">
       <div class="gallery-modal__dialog">
         <button class="close" aria-label="Close preview">&times;</button>
         <img id="gallery-modal-img" alt="" />
@@ -497,29 +497,71 @@ const structuredData = reviewSchema ? [projectSchema, reviewSchema] : [projectSc
       var modalImg = document.getElementById('gallery-modal-img');
       var closeBtn = modal ? modal.querySelector('.close') : null;
       if (!gallery || !modal || !modalImg || !closeBtn) return;
-      function openModal(src, alt) {{
-        modalImg.src = src;
-        modalImg.alt = alt || '';
+      var activeTrigger = null;
+      Array.prototype.forEach.call(gallery.querySelectorAll('img'), function (img) {{
+        if (img.closest('a, button')) return;
+        var media = img.closest('picture') || img;
+        var parent = media.parentNode;
+        if (!parent) return;
+        var trigger = document.createElement('button');
+        var description = img.getAttribute('alt') || 'project image';
+        trigger.type = 'button';
+        trigger.className = 'gallery-trigger';
+        trigger.setAttribute('aria-label', 'Open image preview: ' + description);
+        trigger.setAttribute('aria-haspopup', 'dialog');
+        trigger.setAttribute('aria-controls', 'gallery-modal');
+        parent.insertBefore(trigger, media);
+        trigger.appendChild(media);
+      }});
+      function getTrigger(target) {{
+        return target && target.closest ? target.closest('.gallery-trigger') : null;
+      }}
+      function openModal(trigger) {{
+        var img = trigger.querySelector('img');
+        if (!img) return;
+        activeTrigger = trigger;
+        modalImg.src = img.getAttribute('data-full') || img.src;
+        modalImg.alt = img.alt || '';
         modal.removeAttribute('hidden');
         modal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
         closeBtn.focus();
       }}
       function closeModal() {{
+        if (modal.hasAttribute('hidden')) return;
         modal.setAttribute('hidden', '');
         modal.setAttribute('aria-hidden', 'true');
         modalImg.src = '';
         modalImg.alt = '';
         document.body.style.overflow = '';
+        var returnFocus = activeTrigger;
+        activeTrigger = null;
+        if (returnFocus && returnFocus.isConnected) returnFocus.focus();
       }}
       gallery.addEventListener('click', function (e) {{
-        var img = e.target && e.target.closest && e.target.closest('img');
-        if (!img) return;
-        var full = img.getAttribute('data-full') || img.src;
-        openModal(full, img.alt);
+        var trigger = getTrigger(e.target);
+        if (!trigger || !gallery.contains(trigger)) return;
+        openModal(trigger);
       }});
       closeBtn.addEventListener('click', closeModal);
       modal.addEventListener('click', function (e) {{ if (e.target === modal) closeModal(); }});
+      modal.addEventListener('keydown', function (e) {{
+        if (e.key !== 'Tab' || modal.getAttribute('aria-hidden') !== 'false') return;
+        var focusable = modal.querySelectorAll('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])');
+        if (!focusable.length) {{
+          e.preventDefault();
+          return;
+        }}
+        var first = focusable[0];
+        var last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {{
+          e.preventDefault();
+          last.focus();
+        }} else if (!e.shiftKey && document.activeElement === last) {{
+          e.preventDefault();
+          first.focus();
+        }}
+      }});
       document.addEventListener('keydown', function (e) {{
         if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') closeModal();
       }});
